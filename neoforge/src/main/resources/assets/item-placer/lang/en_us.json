@@ -1,0 +1,8 @@
+{
+  "item.itemplacer.laying_item": "Laying item",
+  "text.autoconfig.itemplacer.option.absoluteSize": "Absolute size",
+  "text.autoconfig.itemplacer.option.tempItemSize": "Size of laying item",
+  "text.autoconfig.itemplacer.option.tempBlockSize": "Size of laying block",
+  "text.autoconfig.itemplacer.option.oldRendering": "Old rendering of blocks"
+
+}

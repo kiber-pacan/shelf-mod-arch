@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "shelfmod",
+  "version": "${version}",
+  "name": "${name}",
+  "description": "${description}",
+  "authors": [
+    "akicater"
+  ],
+  "contact": {
+    "homepage": "https://fabricmc.net/",
+    "sources": "https://github.com/FabricMC/fabric-example-mod"
+  },
+  "license": "CC0-1.0",
+  "icon": "assets/shelfmod/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.akciater.fabric.ShelfModFabric"
+    ],
+    "client": [
+      "com.akciater.fabric.client.ShelfModFabricClient"
+    ],
+    "modmenu": [
+      "com.akciater.fabric.client.config.ModMenuApiImpl"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.16.2",
+    "minecraft": "${minecraft_version}",
+    "java": ">=${java}",
+    "architectury": "${architectury_api_version}",
+    "fabric-api": "*"
+  }
+}

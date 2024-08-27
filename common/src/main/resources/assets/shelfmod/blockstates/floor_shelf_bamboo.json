@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "shelfmod:block/floor_shelf_bamboo", "uvlock": false },
+    "facing=east":  { "model": "shelfmod:block/floor_shelf_bamboo", "y":  90, "uvlock": false },
+    "facing=south": { "model": "shelfmod:block/floor_shelf_bamboo", "y": 180, "uvlock": false },
+    "facing=west":  { "model": "shelfmod:block/floor_shelf_bamboo", "y": 270, "uvlock": false }
+  }
+}

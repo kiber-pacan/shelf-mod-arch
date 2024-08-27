@@ -1,0 +1,28 @@
+{
+  "block.shelfmod.shelf_acacia" : "Acacia shelf",
+  "block.shelfmod.shelf_bamboo" : "Bamboo shelf",
+  "block.shelfmod.shelf_birch" : "Birch shelf",
+  "block.shelfmod.shelf_cherry" : "Cherry shelf",
+  "block.shelfmod.shelf_crimson" : "Crimson shelf",
+  "block.shelfmod.shelf_dark_oak" : "Dark oak shelf",
+  "block.shelfmod.shelf_jungle" : "Jungle shelf",
+  "block.shelfmod.shelf_mangrove" : "Mangrove shelf",
+  "block.shelfmod.shelf_oak" : "Oak shelf",
+  "block.shelfmod.shelf_warped" : "Warped shelf",
+  "block.shelfmod.shelf_spruce" : "Spruce shelf",
+
+  "block.shelfmod.floor_shelf_acacia" : "Acacia palette",
+  "block.shelfmod.floor_shelf_bamboo" : "Bamboo palette",
+  "block.shelfmod.floor_shelf_birch" : "Birch palette",
+  "block.shelfmod.floor_shelf_cherry" : "Cherry palette",
+  "block.shelfmod.floor_shelf_crimson" : "Crimson palette",
+  "block.shelfmod.floor_shelf_dark_oak" : "Dark oak palette",
+  "block.shelfmod.floor_shelf_jungle" : "Jungle palette",
+  "block.shelfmod.floor_shelf_mangrove" : "Mangrove palette",
+  "block.shelfmod.floor_shelf_oak" : "Oak palette",
+  "block.shelfmod.floor_shelf_warped" : "Warped palette",
+  "block.shelfmod.floor_shelf_spruce" : "Spruce palette",
+
+  "text.autoconfig.shelfmod.option.size" : "Size of item on the shelf",
+  "itemGroup.shelfmod.shelf_mod_tab" : "Shelf mod"
+}

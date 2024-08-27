@@ -1,0 +1,28 @@
+{
+  "block.shelfmod.shelf_acacia" : "Акациевая полка",
+  "block.shelfmod.shelf_bamboo" : "Бамбуковая полка",
+  "block.shelfmod.shelf_birch" : "Березовая полка",
+  "block.shelfmod.shelf_cherry" : "Вишнёвая полка",
+  "block.shelfmod.shelf_crimson" : "Багровая полка",
+  "block.shelfmod.shelf_dark_oak" : "Полка из тёмного дуба",
+  "block.shelfmod.shelf_jungle" : "Полка из тропического дерева",
+  "block.shelfmod.shelf_mangrove" : "Мангровая полка",
+  "block.shelfmod.shelf_oak" : "Дубовая полка",
+  "block.shelfmod.shelf_warped" : "Искаженная полка",
+  "block.shelfmod.shelf_spruce" : "Еловая полка",
+
+  "block.shelfmod.floor_shelf_acacia" : "Акациевый паллет",
+  "block.shelfmod.floor_shelf_bamboo" : "Бамбуковый паллет",
+  "block.shelfmod.floor_shelf_birch" : "Березовый паллет",
+  "block.shelfmod.floor_shelf_cherry" : "Вишнёвый паллет",
+  "block.shelfmod.floor_shelf_crimson" : "Багровый паллет",
+  "block.shelfmod.floor_shelf_dark_oak" : "паллет из тёмного дуба",
+  "block.shelfmod.floor_shelf_jungle" : "паллет из тропического дерева",
+  "block.shelfmod.floor_shelf_mangrove" : "Мангровый паллет",
+  "block.shelfmod.floor_shelf_oak" : "Дубовый паллет",
+  "block.shelfmod.floor_shelf_warped" : "Искаженный паллет",
+  "block.shelfmod.floor_shelf_spruce" : "Еловый паллет",
+
+  "text.autoconfig.shelfmod.option.size" : "Размер предмета на полке",
+  "itemGroup.shelfmod.shelf_mod_tab" : "Shelf mod"
+}

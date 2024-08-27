@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "quilt_loader": {
+    "group": "DOLBAEB",
+    "id": "shelfmod",
+    "version": "${version}",
+    "metadata": {
+      "name": "${name}",
+      "description": "This is an example description! Tell everyone what your mod is about!",
+      "contributors": {
+        "Me!": "Author"
+      },
+      "icon": "assets/example_mod/icon.png"
+    },
+    "intermediate_mappings": "net.fabricmc:intermediary",
+    "entrypoints": {
+      "init": [
+        "com.akicater.quilt.ShelfModQuilt"
+      ],
+      "client": [
+        "com.akicater.quilt.client.ShelfModQuiltClient"
+      ]
+    },
+    "depends": [
+      {
+        "id": "quilt_loader",
+        "version": "*"
+      },
+      {
+        "id": "quilt_base",
+        "version": "*"
+      },
+      {
+        "id": "minecraft",
+        "version": ">=${minecraft_version}"
+      },
+      {
+        "id": "architectury",
+        "version": ">=${architectury_api_version}"
+      }
+    ]
+  },
+  "mixin": [
+
+  ]
+}
