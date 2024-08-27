@@ -1,9 +1,9 @@
 # gradle
 
-.gradle/
-build/
-out/
-classes/
+*.gradle/
+*build/
+*out/
+*classes/
 
 # eclipse
 
@@ -41,4 +41,4 @@ replay_*.log
 
 buildAllJars/
 
-wrapper/
+*wrapper/
