@@ -30,7 +30,7 @@ bin/
 
 # fabric
 
-run/
+*run/
 
 # java
 
@@ -41,4 +41,6 @@ replay_*.log
 
 buildAllJars/
 
-*wrapper/
+wrapper/
+
+*.jar
