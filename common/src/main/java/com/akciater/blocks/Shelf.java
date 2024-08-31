@@ -54,6 +54,10 @@ public class Shelf extends HorizontalFacingBlock implements Waterloggable, Block
             } else if (stack.isEmpty()) {
                 player.setStackInHand(Hand.MAIN_HAND, blockEntity.inventory.get(slot));
                 blockEntity.inventory.set(slot, ItemStack.EMPTY);
+            } else if (!stack.isEmpty() && !blockEntity.inventory.get(slot).isEmpty()) {
+                ItemStack temp = stack.copy();
+                player.setStackInHand(Hand.MAIN_HAND, blockEntity.inventory.get(slot));
+                blockEntity.inventory.set(slot, temp);
             }
             world.emitGameEvent(player, GameEvent.BLOCK_CHANGE, pos);
             blockEntity.markDirty();

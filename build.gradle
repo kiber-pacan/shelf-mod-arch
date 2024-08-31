@@ -1,15 +1,17 @@
 plugins {
     id 'dev.architectury.loom' version '1.7-SNAPSHOT' apply false
-
     id 'architectury-plugin' version '3.4-SNAPSHOT'
 
     id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
-
     id 'systems.manifold.manifold-gradle-plugin' version '0.0.2-alpha'
+
+    id 'com.matthewprenger.cursegradle' version '1.4.0' apply false
+    id 'com.modrinth.minotaur' version '2.+' apply false
 }
 
 project.gradle.ext.getProperties().each { prop ->
-    rootProject.ext.set(prop.key, prop.value)
+    //if (prop.key != null && prop.value != null)
+        rootProject.ext.set(prop.key, prop.value)
 }
 
 architectury {
@@ -26,6 +28,8 @@ subprojects {
     apply plugin: 'architectury-plugin'
     apply plugin: 'maven-publish'
     apply plugin: "systems.manifold.manifold-gradle-plugin"
+    apply plugin: "com.modrinth.minotaur"
+    apply plugin: "com.matthewprenger.cursegradle"
 
     base {
         archivesName = "$rootProject.archives_name-mc$project.minecraft_version-$project.name"
@@ -40,7 +44,6 @@ subprojects {
     configurations {
         testImplementation.extendsFrom annotationProcessor
     }
-
 
     processResources {
         def replaceProperties = [
@@ -77,22 +80,44 @@ subprojects {
         }
     }
 
+    java {
+        withSourcesJar()
+        targetCompatibility = sourceCompatibility = rootProject.java as Integer
+    }
 
-    // Configure Maven publishing.
-    publishing {
-        publications {
-            mavenJava(MavenPublication) {
-                artifactId = base.archivesName.get()
-                from components.java
+    tasks.withType(JavaCompile).configureEach {
+        it.options.release = rootProject.java as Integer
+    }
+
+    def loader = project.name
+    print(loader)
+    apply plugin: "com.modrinth.minotaur"
+
+
+    modrinth {
+        token = "token"
+        projectId = "shelf-mod"
+        versionName = archives_name + " " + mod_version
+        versionNumber = mod_version
+        versionType = "release"
+        uploadFile = remapJar
+        gameVersions = [rootProject.minecraft_version]
+        loaders = [loader]
+        dependencies {
+            if (loader.equals("fabric")) {
+                required.project "cloth-config"
+                required.project "fabric-api"
+                required.project "modmenu"
+                required.project "architectury-api"
+            } else if (loader.equals("forge") || loader.equals("neoforge")) {
+                required.project "cloth-config"
+                required.project "architectury-api"
             }
         }
+        failSilently = true
+    }
 
-        // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-        repositories {
-            // Add repositories to publish to here.
-            // Notice: This block does NOT have the same function as the block in the top level.
-            // The repositories here will be used for publishing your artifact, not for
-            // retrieving dependencies.
-        }
+    publishing {
+
     }
 }

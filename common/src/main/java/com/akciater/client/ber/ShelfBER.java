@@ -106,7 +106,7 @@ public abstract class ShelfBER implements BlockEntityRenderer<ShelfBlockEntity> 
                 matrices.translate(-0.5, 0, -0.5);
                 matrices.translate(pos.x, pos.y - (0.40625 * (1 - blockSize)) / 2, pos.z);
 
-                float scale = (MinecraftClient.getInstance().getItemRenderer()#if MC_VER >= V1_19_4 .getModel #else .getHeldItemModel #endif(stack, world, null, 1).hasDepth()) ? 0.40625f * 2 : 0.40625f;
+                float scale = (MinecraftClient.getInstance().getItemRenderer().getModel(stack, world, null, 1).hasDepth()) ? 0.40625f * 2 : 0.40625f;
                 matrices.scale(scale * blockSize, scale * blockSize, scale * blockSize);
 
                 #if MC_VER >= V1_19_4

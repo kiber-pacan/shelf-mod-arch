@@ -44,4 +44,4 @@ buildAllJars/
 wrapper/
 
 *.jar
-/daemon/
+daemon/

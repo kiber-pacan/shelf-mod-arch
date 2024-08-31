@@ -37,21 +37,17 @@ public class ShelfBlockEntity extends BlockEntity implements BlockEntityProvider
     }
 
     @Override
-    public #if MC_VER >= V1_21 Packet<ClientPlayPacketListener> #else BlockEntityUpdateS2CPacket #endif toUpdatePacket() {
-        return #if MC_VER >= V1_21 BlockEntityUpdateS2CPacket.create(this) #else new BlockEntityUpdateS2CPacket(new PacketByteBuf(Unpooled.buffer())) #endif;
+    public Packet<ClientPlayPacketListener> toUpdatePacket() {
+        return BlockEntityUpdateS2CPacket.create(this);
     }
 
     @Override
     public NbtCompound toInitialChunkDataNbt(#if MC_VER >= V1_21 RegistryWrapper.WrapperLookup registryLookup #endif ) {
-        #if MC_VER >= V1_19_4
-            return createNbt(
-                #if MC_VER >= V1_21
+        return createNbt(
+            #if MC_VER >= V1_21
                 registryLookup
-                #endif
-            );
-        #else
-            return new NbtCompound();
-        #endif
+            #endif
+        );
     }
 
     @Override
@@ -81,7 +77,7 @@ public class ShelfBlockEntity extends BlockEntity implements BlockEntityProvider
 
 
     @Override
-    public #if MC_VER >= V1_19_4 void #else NbtCompound #endif writeNbt(
+    public void writeNbt(
             NbtCompound nbt
             #if MC_VER >= V1_21
             , RegistryWrapper.WrapperLookup registryLookup
@@ -100,7 +96,6 @@ public class ShelfBlockEntity extends BlockEntity implements BlockEntityProvider
                 , registryLookup
                 #endif
         );
-        return nbt;
     }
 
     @Override
