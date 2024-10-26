@@ -10,7 +10,7 @@ plugins {
 }
 
 project.gradle.ext.getProperties().each { prop ->
-    //if (prop.key != null && prop.value != null)
+    if (prop.key != null && prop.value != null)
         rootProject.ext.set(prop.key, prop.value)
 }
 
@@ -36,24 +36,55 @@ subprojects {
     }
 
     repositories {
-        mavenLocal()
-        mavenCentral()
-        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+        maven {
+            name = 'ParchmentMC'
+            url = 'https://maven.parchmentmc.org'
+        }
     }
 
     configurations {
         testImplementation.extendsFrom annotationProcessor
     }
 
+    loom {
+        silentMojangMappingsLicense()
+    }
+
+    java {
+        withSourcesJar()
+
+        toolchain {
+            if (project.java_version == "17") {
+                languageVersion = JavaLanguageVersion.of(17)
+                vendor = JvmVendorSpec.ADOPTIUM
+            } else {
+                languageVersion = JavaLanguageVersion.of(21)
+                vendor = JvmVendorSpec.ADOPTIUM
+            }
+        }
+    }
+
     processResources {
         def replaceProperties = [
                 version : project.mod_version,
                 minecraft_version : project.minecraft_version,
-                java : "17",
+                fabric_loader_version : project.fabric_loader_version,
+                architectury_api_version : project.architectury_api_version,
+                java : project.java_version,
                 name : "Shelf mod",
-                description : "Simple mod that adds shelves to minecraft",
-                architectury_api_version : project.architectury_api_version
+                modid : archives_name,
+                description : "Description",
+                authors : "Akicater",
+                license : "MIT",
+                sources : "https://github.com/"
         ]
+
+        if (rootProject.hasProperty("forge_version")) {
+            replaceProperties.put("forge_loader_version", project.forge_version)
+        }
+        if (rootProject.hasProperty("neoforge_version")) {
+            replaceProperties.put("neoforge_loader_version", project.neoforge_version)
+        }
 
         def files = ["fabric.mod.json", "META-INF/mods.toml", "META-INF/neoforge.mods.toml", "quilt.mod.json"]
         inputs.properties replaceProperties
@@ -70,23 +101,20 @@ subprojects {
     dependencies {
         annotationProcessor("systems.manifold:manifold-preprocessor:${manifold_version}")
         minecraft "net.minecraft:minecraft:$rootProject.minecraft_version"
-        if (rootProject.hasProperty("yarn_mappings_patch_neoforge_version")) {
-            mappings loom.layered {
-                it.mappings("net.fabricmc:yarn:$rootProject.yarn_mappings:v2")
-                it.mappings("dev.architectury:yarn-mappings-patch-neoforge:$rootProject.yarn_mappings_patch_neoforge_version")
-            }
-        } else {
-            mappings "net.fabricmc:yarn:$rootProject.yarn_mappings:v2"
+
+        mappings loom.layered() {
+            officialMojangMappings()
+            parchment("org.parchmentmc.data:parchment-1.21:2024.07.28@zip")
         }
     }
 
     java {
         withSourcesJar()
-        targetCompatibility = sourceCompatibility = rootProject.java as Integer
+        targetCompatibility = sourceCompatibility = rootProject.java_version as Integer
     }
 
     tasks.withType(JavaCompile).configureEach {
-        it.options.release = rootProject.java as Integer
+        it.options.release = rootProject.java_version as Integer
     }
 
     def loader = project.name
@@ -95,8 +123,8 @@ subprojects {
 
 
     modrinth {
-        token = "token"
-        projectId = "shelf-mod"
+        token = ""
+        projectId = "shelfmod"
         versionName = archives_name + " " + mod_version
         versionNumber = mod_version
         versionType = "release"
@@ -105,19 +133,42 @@ subprojects {
         loaders = [loader]
         dependencies {
             if (loader.equals("fabric")) {
-                required.project "cloth-config"
                 required.project "fabric-api"
-                required.project "modmenu"
-                required.project "architectury-api"
-            } else if (loader.equals("forge") || loader.equals("neoforge")) {
-                required.project "cloth-config"
-                required.project "architectury-api"
             }
+
+            required.project "architectury-api"
         }
         failSilently = true
     }
 
-    publishing {
+    curseforge {
+        apiKey = "token"
 
+        project {
+            id = "1124962"
+            releaseType = "release"
+            addGameVersion mod_version
+
+            mainArtifact(remapJar.archiveFile.get().asFile) {
+                it.displayName = archives_name + " " + mod_version
+
+                relations {
+                    if (loader.equals("fabric")) {
+                        requiredDependency "fabric-api"
+                    }
+
+                    requiredDependency "architectury-api"
+                }
+            }
+
+            afterEvaluate {
+                uploadTask.dependsOn("build")
+            }
+        }
+
+        options {
+            forgeGradleIntegration = false
+            javaVersionAutoDetect = false
+        }
     }
 }
