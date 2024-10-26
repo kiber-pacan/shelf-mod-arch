@@ -2,25 +2,20 @@
 package com.akciater.blocks;
 
 import io.netty.buffer.Unpooled;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 #if MC_VER >= V1_19_4
-    import net.minecraft.registry.RegistryWrapper;
-    import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
-    import net.minecraft.network.packet.Packet;
-    import net.minecraft.network.listener.ClientPlayPacketListener;
+
 #else
     import net.minecraft.network.Packet;
     import net.minecraft.network.listener.ClientPlayPacketListener;
@@ -29,96 +24,57 @@ import org.jetbrains.annotations.Nullable;
 
 import static com.akciater.ShelfModCommon.SHELF_BLOCK_ENTITY;
 
-public class ShelfBlockEntity extends BlockEntity implements BlockEntityProvider {
-    public final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(4, ItemStack.EMPTY);
+public class ShelfBlockEntity extends BlockEntity{
+    public NonNullList<ItemStack> inv;
 
-    public ShelfBlockEntity(BlockPos pos, BlockState state) {
-        super(SHELF_BLOCK_ENTITY.get(), pos, state);
+    public ShelfBlockEntity(BlockPos pos, BlockState blockState) {
+        super(SHELF_BLOCK_ENTITY.get(), pos, blockState);
+        inv = NonNullList.withSize(4, ItemStack.EMPTY);
     }
 
-    @Override
-    public Packet<ClientPlayPacketListener> toUpdatePacket() {
-        return BlockEntityUpdateS2CPacket.create(this);
+    // Load nbt data shit
+    #if MC_VER >= V1_21 protected #else public #endif void #if MC_VER >= V1_21 loadAdditional #else load #endif(CompoundTag compoundTag#if MC_VER >= V1_21 , HolderLookup.Provider provider#endif) {
+        #if MC_VER >= V1_21 super.loadAdditional(compoundTag, provider); #else super.load(compoundTag); #endif
+        ContainerHelper.loadAllItems(compoundTag, this.inv #if MC_VER >= V1_21 , provider #endif);
     }
 
-    @Override
-    public NbtCompound toInitialChunkDataNbt(#if MC_VER >= V1_21 RegistryWrapper.WrapperLookup registryLookup #endif ) {
-        return createNbt(
-            #if MC_VER >= V1_21
-                registryLookup
-            #endif
-        );
+    // Save nbt data
+    #if MC_VER >= V1_21 protected #else public @NotNull #endif  #if MC_VER < V1_18_2 CompoundTag save #else void saveAdditional #endif (CompoundTag compoundTag#if MC_VER >= V1_21 , HolderLookup.Provider provider#endif) {
+        super.#if MC_VER < V1_18_2 save #else saveAdditional #endif(compoundTag #if MC_VER >= V1_21 , provider #endif);
+
+        ContainerHelper.saveAllItems(compoundTag, this.inv #if MC_VER >= V1_21 , provider #endif);
+
+        #if MC_VER < V1_18_2
+        return compoundTag;
+        #endif
     }
 
-    @Override
-    public void readNbt(
-            NbtCompound nbt
-            #if MC_VER >= V1_21
-            , RegistryWrapper.WrapperLookup registryLookup
-            #endif
-    ) {
-        super.readNbt(
-                nbt
-                #if MC_VER >= V1_21
-                , registryLookup
-                #endif
-        );
-        inventory.clear();
-        Inventories.readNbt(
-                nbt,
-                inventory
-                #if MC_VER >= V1_21
-                , registryLookup
-                #endif
-        );
-        markDirty();
+    /* At this point i just wanna fucking kill myself
+    for god's sake don't ever ever ever forget to add these stupid methods*/
+    @Nullable
+    public ClientboundBlockEntityDataPacket getUpdatePacket() {
+        #if MC_VER < V1_18_2
+        return new ClientboundBlockEntityDataPacket(this.worldPosition, -1, this.save(new CompoundTag()));
+        #else
+        return ClientboundBlockEntityDataPacket.create(this);
+        #endif
     }
 
-
-
-    @Override
-    public void writeNbt(
-            NbtCompound nbt
-            #if MC_VER >= V1_21
-            , RegistryWrapper.WrapperLookup registryLookup
-            #endif
-    ) {
-        super.writeNbt(
-                nbt
-                #if MC_VER >= V1_21
-                , registryLookup
-                #endif
-        );
-        Inventories.writeNbt(
-                nbt,
-                inventory
-                #if MC_VER >= V1_21
-                , registryLookup
-                #endif
-        );
+    public @NotNull CompoundTag getUpdateTag(#if MC_VER >= V1_21 HolderLookup.Provider provider #endif) {
+        return #if MC_VER < V1_18_2 this.save(new CompoundTag()) #elif MC_VER >= V1_21 this.saveCustomOnly(provider) #else this.saveWithoutMetadata() #endif;
     }
 
-    @Override
+    // Mark dirty so client get synced with server
     public void markDirty() {
-        if (this.world != null) {
-            markDirtyInWorld(this.world, this.pos, this.getCachedState());
+        this.setChanged();
+        this.getLevel().sendBlockUpdated(this.getBlockPos(), this.getBlockState(), this.getBlockState(), 3);
+    }
+
+    public boolean isEmpty() {
+        for (ItemStack itemStack : this.inv) {
+            if (!itemStack.isEmpty()) return false;
         }
-    }
 
-    protected void markDirtyInWorld(World world, BlockPos pos, BlockState state) {
-        world.markDirty(pos);
-
-        if (!world.isClient()) {
-            ((ServerWorld) world).getChunkManager().markForUpdate(pos);
-        }
-    }
-
-    public void clear() {
-        inventory.clear();
-    }
-
-    @Override
-    public @Nullable BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new ShelfBlockEntity(pos, state);
+        return true;
     }
 }

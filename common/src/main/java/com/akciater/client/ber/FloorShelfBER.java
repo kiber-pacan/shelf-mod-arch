@@ -1,26 +1,23 @@
 package com.akciater.client.ber;
 
-import com.akciater.blocks.FloorShelfBlockEntity;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.LightmapTextureManager;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.entity.BlockEntityRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.render.item.ItemRenderer;
-import net.minecraft.client.render.model.json.ModelTransformation;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.LightType;
-import net.minecraft.world.World;
 #if MC_VER >= V1_19_4
-    import net.minecraft.client.render.model.json.ModelTransformationMode;
-    import net.minecraft.util.math.RotationAxis;
+    import com.akciater.blocks.FloorShelfBlockEntity;
+    import com.akciater.blocks.ShelfBlockEntity;
+    import com.mojang.blaze3d.vertex.PoseStack;
+    import com.mojang.math.Axis;
+    import net.minecraft.client.Minecraft;
+    import net.minecraft.client.renderer.MultiBufferSource;
+    import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+    import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+    import net.minecraft.client.renderer.entity.ItemRenderer;
+    import net.minecraft.core.Direction;
+    import net.minecraft.world.item.BlockItem;
+    import net.minecraft.world.item.ItemDisplayContext;
+    import net.minecraft.world.item.ItemStack;
+    import net.minecraft.world.level.Level;
+    import net.minecraft.world.level.block.Blocks;
+    import net.minecraft.world.level.block.state.BlockState;
+    import net.minecraft.world.phys.Vec3;
     import org.joml.Quaternionf;
 #else
     import net.minecraft.util.math.Quaternion;
@@ -29,23 +26,25 @@ import net.minecraft.world.World;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class FloorShelfBER implements BlockEntityRenderer<FloorShelfBlockEntity> {
-    public List<Vec3d> positions = new ArrayList<>(
+    import static com.akciater.blocks.FloorShelf.FACING;
+
+public class FloorShelfBER implements BlockEntityRenderer<FloorShelfBlockEntity> {
+    public List<Vec3> positions = new ArrayList<>(
             List.of(
-                    new Vec3d(0.265625F, 0.275F, 0.265625F),
-                    new Vec3d(0.734375F, 0.275F, 0.265625F),
-                    new Vec3d(0.265625F, 0.275F, 0.734375F),
-                    new Vec3d(0.734375F, 0.275F, 0.734375F)
+                    new Vec3(0.265625F, 0.275F, 0.265625F),
+                    new Vec3(0.734375F, 0.275F, 0.265625F),
+                    new Vec3(0.265625F, 0.275F, 0.734375F),
+                    new Vec3(0.734375F, 0.275F, 0.734375F)
             )
     );
 
     public #if MC_VER >= V1_19_4 Quaternionf #else Quaternion #endif getRotation(Direction direction) {
         return switch (direction) {
             #if MC_VER >= V1_19_4
-            case NORTH -> RotationAxis.POSITIVE_Y.rotationDegrees(0);
-            case EAST -> RotationAxis.POSITIVE_Y.rotationDegrees(270);
-            case SOUTH -> RotationAxis.POSITIVE_Y.rotationDegrees(180);
-            case WEST -> RotationAxis.POSITIVE_Y.rotationDegrees(90);
+            case NORTH -> Axis.YP.rotationDegrees(0);
+            case EAST -> Axis.YP.rotationDegrees(270);
+            case SOUTH -> Axis.YP.rotationDegrees(180);
+            case WEST -> Axis.YP.rotationDegrees(90);
             default -> null;
             #else
             case DOWN -> null;
@@ -58,51 +57,48 @@ public abstract class FloorShelfBER implements BlockEntityRenderer<FloorShelfBlo
         };
     }
 
-    public FloorShelfBER(BlockEntityRendererFactory.Context ctx) {
+    public FloorShelfBER(BlockEntityRendererProvider.Context ctx) {}
 
-    }
-
-    static int getLight(World world, BlockPos pos){
-        return LightmapTextureManager.pack(world.getLightLevel(LightType.BLOCK, pos), world.getLightLevel(LightType.SKY, pos));
-    }
-
-    public void render(FloorShelfBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, float blockSize) {
+    public void render(FloorShelfBlockEntity entity, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
         BlockState state;
-        World world = entity.getWorld();
+        Level world = entity.getLevel();
 
-        if ((state = world.getBlockState(entity.getPos())).getBlock() == Blocks.AIR) return;
-        ItemRenderer itemRenderer = MinecraftClient.getInstance().getItemRenderer();
+        if ((state = world.getBlockState(entity.getBlockPos())).getBlock() == Blocks.AIR) return;
+        ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
 
         #if MC_VER >= V1_19_4
-            Quaternionf quaternionf = getRotation(state.get(Properties.HORIZONTAL_FACING));
+            Quaternionf quaternionf = getRotation(state.getValue(FACING));
         #else
-            Quaternion quaternionf = getRotation(state.get(Properties.HORIZONTAL_FACING));
+            Quaternion quaternionf = getRotation(state.getValue(FACING));
         #endif
 
-        int x = getLight(world, entity.getPos());
+        float blockSize = 1;
 
         for (int i = 0; i < 4; i++) {
-            ItemStack stack = entity.inventory.get(i);
+            ItemStack stack = entity.inv.get(i);
             if(!stack.isEmpty()) {
-                Vec3d pos = positions.get(i);
+                Vec3 pos = positions.get(i);
 
-                matrices.push();
+                poseStack.pushPose();
 
-                matrices.translate(pos.x, pos.y - (0.40625 * (1 - blockSize)) / 2, pos.z);
-                float scale = (MinecraftClient.getInstance().getItemRenderer().getModel(stack, world, null, 1).hasDepth()) ? 0.40625f * 2 : 0.40625f;
-                matrices.scale(scale * blockSize, scale * blockSize, scale * blockSize);
+                poseStack.translate(pos.x, pos.y - (0.40625 * (1 - blockSize)) / 2, pos.z);
 
-                matrices.multiply(quaternionf);
+                boolean fullBlock = stack.getItem() instanceof BlockItem && ((BlockItem) stack.getItem()).getBlock().defaultBlockState().isCollisionShapeFullBlock(entity.getLevel(), entity.getBlockPos());
+                float scale = (fullBlock) ? 0.40625f * 2 : 0.40625f;
+
+                poseStack.scale(scale * blockSize, scale * blockSize, scale * blockSize);
+
+                poseStack.mulPose(quaternionf);
 
                 #if MC_VER >= V1_19_4
-                    matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90));
-                    itemRenderer.renderItem(stack, ModelTransformationMode.FIXED, x, overlay, matrices, vertexConsumers, entity.getWorld(), 1);
+                    poseStack.mulPose(Axis.XP.rotationDegrees(90));
+                    itemRenderer.renderStatic(stack, #if MC_VER >= V1_19_4 ItemDisplayContext.FIXED #else ItemTransforms.TransformType.FIXED #endif, packedLight, packedOverlay, poseStack, buffer #if MC_VER >= V1_19_4, entity.getLevel() #endif, 1);
                 #else
-                    matrices.multiply(new Quaternion((float) Math.toRadians(90),0 ,0,0));
-                    itemRenderer.renderItem(stack, ModelTransformation.Mode.FIXED, x, overlay, matrices, vertexConsumers, 1);
+                    poseStack.mulPose(new Quaternion((float) Math.toRadians(90),0 ,0,0));
+                    itemRenderer.renderItem(stack, ModelTransformation.Mode.FIXED, x, overlay, poseStack, vertexConsumers, 1);
                 #endif
 
-                matrices.pop();
+                poseStack.popPose();
             }
         }
     }
