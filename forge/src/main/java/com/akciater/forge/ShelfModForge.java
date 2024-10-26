@@ -16,6 +16,7 @@ public final class ShelfModForge {
     public ShelfModForge() {
         EventBuses.registerModEventBus(ShelfModCommon.MODID, FMLJavaModLoadingContext.get().getModEventBus());
         ShelfModCommon.initializeServer();
+
         if (FMLLoader.getDist() == Dist.CLIENT) {
             AutoConfig.register(ShelfModConfigForge.class, Toml4jConfigSerializer::new);
         }

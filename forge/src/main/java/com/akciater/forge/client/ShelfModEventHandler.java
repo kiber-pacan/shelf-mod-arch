@@ -1,8 +1,8 @@
 package com.akicater.neoforge.client;
 
 import com.akciater.ShelfModCommon;
-import com.akciater.client.ber.FloorShelfBER;
-import com.akciater.client.ber.ShelfBER;
+import com.akicater.neoforge.client.ber.FloorShelfBER_NeoForge;
+import com.akicater.neoforge.client.ber.ShelfBER_NeoForge;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 #if MC_VER >= V1_21
@@ -23,7 +23,7 @@ import static com.akciater.ShelfModCommon.MODID;
 public class ShelfModEventHandler {
     @SubscribeEvent
     public static void registerBER(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerBlockEntityRenderer(ShelfModCommon.FLOOR_SHELF_BLOCK_ENTITY.get(), FloorShelfBER::new);
-        event.registerBlockEntityRenderer(ShelfModCommon.SHELF_BLOCK_ENTITY.get(), ShelfBER::new);
+        event.registerBlockEntityRenderer(ShelfModCommon.FLOOR_SHELF_BLOCK_ENTITY.get(), FloorShelfBER_NeoForge::new);
+        event.registerBlockEntityRenderer(ShelfModCommon.SHELF_BLOCK_ENTITY.get(), ShelfBER_NeoForge::new);
     }
 }
