@@ -19,14 +19,34 @@ package com.akciater.client.ber;
     import net.minecraft.world.level.block.state.BlockState;
     import net.minecraft.world.phys.Vec3;
     import org.joml.Quaternionf;
-#else
-    import net.minecraft.util.math.Quaternion;
-#endif
 
-import java.util.ArrayList;
-import java.util.List;
+    import java.util.ArrayList;
+    import java.util.List;
 
     import static com.akciater.blocks.FloorShelf.FACING;
+#else
+    import com.akciater.blocks.FloorShelfBlockEntity;
+    import com.mojang.blaze3d.vertex.PoseStack;
+    import com.mojang.math.Quaternion;
+    import net.minecraft.client.Minecraft;
+    import net.minecraft.client.renderer.MultiBufferSource;
+    import net.minecraft.client.renderer.block.model.ItemTransforms;
+    import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+    import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+    import net.minecraft.client.renderer.entity.ItemRenderer;
+    import net.minecraft.core.Direction;
+    import net.minecraft.world.item.BlockItem;
+    import net.minecraft.world.item.ItemStack;
+    import net.minecraft.world.level.Level;
+    import net.minecraft.world.level.block.Blocks;
+    import net.minecraft.world.level.block.state.BlockState;
+    import net.minecraft.world.phys.Vec3;
+
+    import java.util.ArrayList;
+    import java.util.List;
+
+    import static com.akciater.blocks.FloorShelf.FACING;
+#endif
 
 public class FloorShelfBER implements BlockEntityRenderer<FloorShelfBlockEntity> {
     public List<Vec3> positions = new ArrayList<>(
@@ -94,8 +114,8 @@ public class FloorShelfBER implements BlockEntityRenderer<FloorShelfBlockEntity>
                     poseStack.mulPose(Axis.XP.rotationDegrees(90));
                     itemRenderer.renderStatic(stack, #if MC_VER >= V1_19_4 ItemDisplayContext.FIXED #else ItemTransforms.TransformType.FIXED #endif, packedLight, packedOverlay, poseStack, buffer #if MC_VER >= V1_19_4, entity.getLevel() #endif, 1);
                 #else
-                    poseStack.mulPose(new Quaternion((float) Math.toRadians(90),0 ,0,0));
-                    itemRenderer.renderItem(stack, ModelTransformation.Mode.FIXED, x, overlay, poseStack, vertexConsumers, 1);
+                    poseStack.mulPose(new Quaternion((float) Math.toRadians(90), 0, 0, 0));
+                    itemRenderer.renderStatic(stack, #if MC_VER >= V1_19_4 ItemDisplayContext.FIXED #else ItemTransforms.TransformType.FIXED #endif, packedLight, packedOverlay, poseStack, buffer #if MC_VER >= V1_19_4, entity.getLevel() #endif, 1);
                 #endif
 
                 poseStack.popPose();

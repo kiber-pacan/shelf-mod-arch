@@ -3,7 +3,6 @@ package com.akciater.blocks;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -14,12 +13,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-#if MC_VER >= V1_19_4
-
-#else
-    import net.minecraft.network.Packet;
-    import net.minecraft.network.listener.ClientPlayPacketListener;
-    import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
+#if MC_VER >= V1_21
+import net.minecraft.core.HolderLookup;
 #endif
 
 import static com.akciater.ShelfModCommon.SHELF_BLOCK_ENTITY;

@@ -2,7 +2,6 @@
 package com.akciater.blocks;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -12,6 +11,10 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+#if MC_VER >= V1_21
+import net.minecraft.core.HolderLookup;
+#endif
 
 import static com.akciater.ShelfModCommon.FLOOR_SHELF_BLOCK_ENTITY;
 

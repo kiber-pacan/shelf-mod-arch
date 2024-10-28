@@ -1,36 +1,53 @@
 package com.akciater.client.ber;
 
-import com.akciater.blocks.ShelfBlockEntity;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
-
-import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.entity.ItemRenderer;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.Rotations;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
-import org.joml.Quaternionf;
-
 #if MC_VER >= V1_19_4
+    import com.akciater.blocks.FloorShelfBlockEntity;
+    import com.akciater.blocks.ShelfBlockEntity;
+    import com.mojang.blaze3d.vertex.PoseStack;
+    import com.mojang.math.Axis;
+    import net.minecraft.client.Minecraft;
+    import net.minecraft.client.renderer.MultiBufferSource;
+    import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+    import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+    import net.minecraft.client.renderer.entity.ItemRenderer;
+    import net.minecraft.core.Direction;
+    import net.minecraft.world.item.BlockItem;
+    import net.minecraft.world.item.ItemDisplayContext;
+    import net.minecraft.world.item.ItemStack;
+    import net.minecraft.world.level.Level;
+    import net.minecraft.world.level.block.Blocks;
+    import net.minecraft.world.level.block.state.BlockState;
+    import net.minecraft.world.phys.Vec3;
+    import org.joml.Quaternionf;
 
+    import java.util.ArrayList;
+    import java.util.List;
+
+    import static com.akciater.blocks.Shelf.FACING;
 #else
-    import net.minecraft.util.math.Quaternion;
+    import com.akciater.blocks.ShelfBlockEntity;
+    import com.mojang.blaze3d.vertex.PoseStack;
+    import com.mojang.math.Quaternion;
+    import com.mojang.math.Vector3f;
+    import net.minecraft.client.Minecraft;
+    import net.minecraft.client.renderer.MultiBufferSource;
+    import net.minecraft.client.renderer.block.model.ItemTransforms;
+    import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+    import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+    import net.minecraft.client.renderer.entity.ItemRenderer;
+    import net.minecraft.core.Direction;
+    import net.minecraft.world.item.BlockItem;
+    import net.minecraft.world.item.ItemStack;
+    import net.minecraft.world.level.Level;
+    import net.minecraft.world.level.block.Blocks;
+    import net.minecraft.world.level.block.state.BlockState;
+    import net.minecraft.world.phys.Vec3;
+
+    import java.util.ArrayList;
+    import java.util.List;
+
+    import static com.akciater.blocks.Shelf.FACING;
 #endif
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.akciater.blocks.Shelf.FACING;
 
 public class ShelfBER implements BlockEntityRenderer<ShelfBlockEntity> {
     public List<Vec3> itemPositions = new ArrayList<>(
@@ -83,7 +100,7 @@ public class ShelfBER implements BlockEntityRenderer<ShelfBlockEntity> {
         #if MC_VER >= V1_19_4
             Quaternionf quaternionf = getRotation(state.getValue(FACING));
         #else
-        Quaternion quaternionf = getRotation(state.get(Properties.HORIZONTAL_FACING));
+            Quaternion quaternionf = getRotation(state.getValue(FACING));
         #endif
 
         for (int i = 0; i < 4; i++) {

@@ -54,7 +54,7 @@ public class FloorShelf extends BaseEntityBlock implements SimpleWaterloggedBloc
     #endif
 
     // FUCK MOJANG
-    protected @NotNull RenderShape getRenderShape(BlockState state) {
+    #if MC_VER >= V1_21 protected #else public #endif @NotNull RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
     }
 
@@ -139,6 +139,7 @@ public class FloorShelf extends BaseEntityBlock implements SimpleWaterloggedBloc
                 }
             }
 
+            Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), state.getBlock().asItem().getDefaultInstance());
             super.onRemove(state, level, pos, newState, movedByPiston);
         }
     }
@@ -161,9 +162,11 @@ public class FloorShelf extends BaseEntityBlock implements SimpleWaterloggedBloc
 
     @Override
     public @NotNull BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+        #if MC_VER >= V1_19_2
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
+        #endif
 
         return super.updateShape(state, direction, neighborState, level, pos, neighborPos);
     }
