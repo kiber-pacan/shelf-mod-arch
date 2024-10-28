@@ -1,34 +1,34 @@
 modLoader = "javafml"
 loaderVersion = "[4,)"
-#issueTrackerURL = ""
-license = "MIT"
+license = "${license}"
 
 [[mods]]
-modId = "shelfmod"
+modId = "${modid}"
 version = "${version}"
 displayName = "${name}"
-authors = "akicater"
+authors = "${authors}"
 description = "${description}"
-logoFile = "assets/item-placer/logo.png"
 
-[[dependencies.shelfmod]]
+logoFile = "icon.png"
+
+[[dependencies."${modid}"]]
 modId = "neoforge"
 type = "required"
-versionRange = "[21.0,)"
+versionRange = "[${neoforge_loader_version},)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.shelfmod]]
+[[dependencies."${modid}"]]
 modId = "minecraft"
 type = "required"
-versionRange = "[1.21,)"
+versionRange = "[${minecraft_version},)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.shelfmod]]
+[[dependencies."${modid}"]]
 modId = "architectury"
 type = "required"
-versionRange = "[13.0.2,)"
+versionRange = "[${architectury_api_version},)"
 ordering = "AFTER"
 side = "BOTH"
 

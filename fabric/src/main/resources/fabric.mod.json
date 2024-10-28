@@ -1,17 +1,13 @@
 {
   "schemaVersion": 1,
-  "id": "shelfmod",
+  "id": "${modid}",
   "version": "${version}",
   "name": "${name}",
   "description": "${description}",
   "authors": [
-    "akicater"
+    "${authors}"
   ],
-  "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
-  },
-  "license": "CC0-1.0",
+  "license": "${license}",
   "icon": "assets/shelfmod/icon.png",
   "environment": "*",
   "entrypoints": {
@@ -20,13 +16,13 @@
     ],
     "client": [
       "com.akciater.fabric.client.ShelfModFabricClient"
-    ],
-    "modmenu": [
-      "com.akciater.fabric.client.config.ModMenuApiImpl"
     ]
   },
+  "mixins": [
+    "shelfmod.mixins.json"
+  ],
   "depends": {
-    "fabricloader": ">=0.16.2",
+    "fabricloader": ">=${fabric_loader_version}",
     "minecraft": "${minecraft_version}",
     "java": ">=${java}",
     "architectury": "${architectury_api_version}",

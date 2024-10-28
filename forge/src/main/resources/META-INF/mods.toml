@@ -1,31 +1,31 @@
 modLoader = "javafml"
-loaderVersion = "[45,)"
+loaderVersion = "[43,)"
 #issueTrackerURL = ""
-license = "Insert License Here"
+license = "${license}"
 
 [[mods]]
-modId = "shelfmod"
+modId = "${modid}"
 version = "${version}"
 displayName = "${name}"
-authors = "akicater"
+authors = "${authors}"
 description = "${description}"
-#logoFile = ""
+logoFile = "icon.png"
 
-[[dependencies.shelfmod]]
+[[dependencies."${modid}"]]
 modId = "forge"
 mandatory = true
-versionRange = "[45,)"
+versionRange = "[${forge_loader_version},)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.shelfmod]]
+[[dependencies."${modid}"]]
 modId = "minecraft"
 mandatory = true
 versionRange = "[${minecraft_version},)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.shelfmod]]
+[[dependencies."${modid}"]]
 modId = "architectury"
 mandatory = true
 versionRange = "[${architectury_api_version},)"
