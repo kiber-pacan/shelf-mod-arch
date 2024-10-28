@@ -57,6 +57,9 @@ subprojects {
             if (project.java_version == "17") {
                 languageVersion = JavaLanguageVersion.of(17)
                 vendor = JvmVendorSpec.ADOPTIUM
+            } else if (project.java_version == "8") {
+                languageVersion = JavaLanguageVersion.of(8)
+                vendor = JvmVendorSpec.ADOPTIUM
             } else {
                 languageVersion = JavaLanguageVersion.of(21)
                 vendor = JvmVendorSpec.ADOPTIUM
@@ -74,7 +77,7 @@ subprojects {
                 name : "Shelf mod",
                 modid : archives_name,
                 description : "Description",
-                authors : "Akicater",
+                authors : "akicater",
                 license : "MIT",
                 sources : "https://github.com/"
         ]
@@ -124,7 +127,7 @@ subprojects {
 
     modrinth {
         token = ""
-        projectId = "shelfmod"
+        projectId = "shelf-mod"
         versionName = archives_name + " " + mod_version
         versionNumber = mod_version
         versionType = "release"
