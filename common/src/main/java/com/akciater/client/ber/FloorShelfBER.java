@@ -79,7 +79,7 @@ public class FloorShelfBER implements BlockEntityRenderer<FloorShelfBlockEntity>
 
     public FloorShelfBER(BlockEntityRendererProvider.Context ctx) {}
 
-    public void render(FloorShelfBlockEntity entity, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
+    public void render(#if MC_VER < V1_21_5 FloorShelfBlockEntity entity, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay #else FloorShelfBlockEntity entity, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay, Vec3 cameraPos #endif) {
         BlockState state;
         Level world = entity.getLevel();
 

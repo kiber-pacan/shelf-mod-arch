@@ -89,7 +89,7 @@ public class ShelfBER implements BlockEntityRenderer<ShelfBlockEntity> {
 
     public ShelfBER(BlockEntityRendererProvider.Context ctx) {}
 
-    public void render(ShelfBlockEntity entity, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
+    public void render(#if MC_VER < V1_21_5 ShelfBlockEntity entity, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay #else ShelfBlockEntity entity, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay, Vec3 cameraPos #endif) {
         int blockSize = 1;
         int itemSize = 1;
         BlockState state;
