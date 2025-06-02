@@ -6,6 +6,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -22,7 +23,7 @@ public class FloorShelfBlockEntity extends BlockEntity {
     public NonNullList<ItemStack> inv;
 
     public FloorShelfBlockEntity(BlockPos pos, BlockState blockState) {
-        super(FLOOR_SHELF_BLOCK_ENTITY.get(), pos, blockState);
+        super(FLOOR_SHELF_BLOCK_ENTITY #if MC_VER < V1_21_3 .get() #endif, pos, blockState);
         inv = NonNullList.withSize(4, ItemStack.EMPTY);
     }
 
@@ -71,4 +72,29 @@ public class FloorShelfBlockEntity extends BlockEntity {
 
         return true;
     }
+
+    #if MC_VER >= V1_21_5
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        FloorShelfBlockEntity entity = (FloorShelfBlockEntity) level#if MC_VER < V1_21 .getChunk(pos) #endif.getBlockEntity(pos);
+        if (entity != null) {
+            if (!entity.isEmpty()) {
+                for(int i = 0; i < 4; ++i) {
+                    ItemStack itemStack = entity.inv.get(i);
+                    if (!itemStack.isEmpty()) {
+                        Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), itemStack);
+                    }
+                }
+
+                entity.inv.clear();
+                entity.setRemoved();
+
+                level.updateNeighbourForOutputSignal(pos, state.getBlock());
+            }
+        }
+
+        Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), state.getBlock().asItem().getDefaultInstance());
+
+        super.preRemoveSideEffects(pos, state);
+    }
+    #endif
 }

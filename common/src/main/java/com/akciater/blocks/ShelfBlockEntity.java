@@ -7,7 +7,9 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +25,7 @@ public class ShelfBlockEntity extends BlockEntity{
     public NonNullList<ItemStack> inv;
 
     public ShelfBlockEntity(BlockPos pos, BlockState blockState) {
-        super(SHELF_BLOCK_ENTITY.get(), pos, blockState);
+        super(SHELF_BLOCK_ENTITY #if MC_VER < V1_21_3 .get() #endif, pos, blockState);
         inv = NonNullList.withSize(4, ItemStack.EMPTY);
     }
 
@@ -63,6 +65,7 @@ public class ShelfBlockEntity extends BlockEntity{
     public void markDirty() {
         this.setChanged();
         this.getLevel().sendBlockUpdated(this.getBlockPos(), this.getBlockState(), this.getBlockState(), 3);
+
     }
 
     public boolean isEmpty() {
@@ -72,4 +75,29 @@ public class ShelfBlockEntity extends BlockEntity{
 
         return true;
     }
+
+    #if MC_VER >= V1_21_5
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        ShelfBlockEntity entity = (ShelfBlockEntity) level#if MC_VER < V1_21 .getChunk(pos) #endif.getBlockEntity(pos);
+        if (entity != null) {
+            if (!entity.isEmpty()) {
+                for(int i = 0; i < 4; ++i) {
+                    ItemStack itemStack = entity.inv.get(i);
+                    if (!itemStack.isEmpty()) {
+                        Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), itemStack);
+                    }
+                }
+
+                entity.inv.clear();
+                entity.setRemoved();
+
+                level.updateNeighbourForOutputSignal(pos, state.getBlock());
+            }
+        }
+
+        Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), state.getBlock().asItem().getDefaultInstance());
+
+        super.preRemoveSideEffects(pos, state);
+    }
+    #endif
 }
