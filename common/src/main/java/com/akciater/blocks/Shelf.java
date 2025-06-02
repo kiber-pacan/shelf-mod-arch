@@ -4,6 +4,9 @@ import com.akciater.ShelfModCommon;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+#if MC_VER > V1_19_2
+import net.minecraft.util.RandomSource;
+#endif
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -11,14 +14,15 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+#if MC_VER < V1_21_3
+    import net.minecraft.world.level.block.state.properties.DirectionProperty;
+#endif
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.material.FluidState;
@@ -33,8 +37,11 @@ import org.jetbrains.annotations.NotNull;
 public class Shelf extends BaseEntityBlock implements SimpleWaterloggedBlock {
     #if MC_VER > V1_20_1 public static final MapCodec<Shelf> CODEC = simpleCodec(Shelf::new); #endif
     public static BooleanProperty WATERLOGGED = BooleanProperty.create("waterlogged");
-    public static DirectionProperty FACING = DirectionProperty.create("facing");
-
+    #if MC_VER >= V1_21_3
+    public static EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
+    #else
+        public static DirectionProperty FACING = DirectionProperty.create("facing");
+    #endif
     public Shelf(Properties properties) {
         super(properties);
         this.registerDefaultState(this.stateDefinition.any().setValue(WATERLOGGED, false));
@@ -112,8 +119,10 @@ public class Shelf extends BaseEntityBlock implements SimpleWaterloggedBlock {
         return slot;
     }
 
+    // Drop items on break
+    #if MC_VER < V1_21_5
     @Override
-    #if MC_VER >= V1_21 protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) #else public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) #endif {
+    #if MC_VER >= V1_21  protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) #else public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) #endif {
         if (!state.is(newState.getBlock())) {
             ShelfBlockEntity entity = (ShelfBlockEntity) level#if MC_VER < V1_21 .getChunk(pos) #endif.getBlockEntity(pos);
             if (entity != null) {
@@ -136,6 +145,7 @@ public class Shelf extends BaseEntityBlock implements SimpleWaterloggedBlock {
             super.onRemove(state, level, pos, newState, movedByPiston);
         }
     }
+    #endif
 
     @Override
     #if MC_VER >= V1_21 protected @NotNull VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) #else public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context)  #endif {
@@ -170,14 +180,23 @@ public class Shelf extends BaseEntityBlock implements SimpleWaterloggedBlock {
         builder.add(WATERLOGGED).add(FACING);
     }
 
+    #if MC_VER < V1_21_3
     @Override
-    public @NotNull BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
-        #if MC_VER >= V1_19_2
+    public @NotNull BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos)  {
         if (state.getValue(WATERLOGGED)) {
-            level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+            level #if MC_VER <= V1_17_1 .getLiquidTicks() #endif.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
-        #endif
 
-        return super.updateShape(state, direction, neighborState, level, pos, neighborPos);
+        return super.updateShape(state, direction, neighborState, level, pos,  neighborPos);
     }
+    #else
+    @Override
+    public @NotNull BlockState updateShape(BlockState blockState, LevelReader levelReader, ScheduledTickAccess scheduledTickAccess, BlockPos blockPos, Direction direction, BlockPos arg6, BlockState arg7, RandomSource arg8) {
+        if (blockState.getValue(WATERLOGGED)) {
+            scheduledTickAccess.scheduleTick(blockPos, Fluids.WATER, Fluids.WATER.getTickDelay(levelReader));
+        }
+
+        return super.updateShape(blockState, levelReader, scheduledTickAccess, blockPos, direction, arg6, arg7, arg8);
+    }
+    #endif
 }
