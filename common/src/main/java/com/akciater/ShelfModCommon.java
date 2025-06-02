@@ -6,13 +6,26 @@ import com.akciater.blocks.Shelf;
 import com.akciater.blocks.ShelfBlockEntity;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+
+import com.mojang.logging.LogUtils;
+import dev.architectury.platform.Platform;
 import dev.architectury.registry.CreativeTabRegistry;
+import dev.architectury.registry.ReloadListenerRegistry;
 import dev.architectury.registry.registries.Registrar;
 import dev.architectury.registry.registries.RegistrySupplier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.resources.*;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -23,21 +36,32 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 
 #if MC_VER >= V1_21
 import dev.architectury.registry.registries.RegistrarManager;
-import org.slf4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;
 #endif
 
 #if MC_VER >= V1_19_4
 import dev.architectury.registry.registries.RegistrarManager;
 import net.minecraft.core.registries.Registries;
+import org.spongepowered.include.com.google.common.io.Resources;
 #else
 import dev.architectury.registry.registries.Registries;
 import net.minecraft.core.Registry;
 #endif
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.function.Supplier;
+import java.util.logging.Logger;
 
 public final class ShelfModCommon {
     public static final String MODID = "shelfmod";
@@ -62,160 +86,73 @@ public final class ShelfModCommon {
 
     public static RegistrySupplier<Item> ICON;
 
-    public static RegistrySupplier<Block> SHELF_OAK;
-    public static RegistrySupplier<Block> FLOOR_SHELF_OAK;
+    public static #if MC_VER >= V1_21_3 BlockEntityType<ShelfBlockEntity> #else RegistrySupplier<BlockEntityType<ShelfBlockEntity>> #endif SHELF_BLOCK_ENTITY;
+    public static #if MC_VER >= V1_21_3 BlockEntityType<FloorShelfBlockEntity> #else RegistrySupplier<BlockEntityType<FloorShelfBlockEntity>> #endif FLOOR_SHELF_BLOCK_ENTITY;
 
-    public static RegistrySupplier<Block> SHELF_ACACIA;
-    public static RegistrySupplier<Block> FLOOR_SHELF_ACACIA;
+    public static #if MC_VER == V1_19_4 CreativeTabRegistry.TabSupplier #elif MC_VER <= V1_19_2 CreativeModeTab #else RegistrySupplier<CreativeModeTab> #endif SHELF_MOD_TAB;
 
-    public static RegistrySupplier<Block> SHELF_BIRCH;
-    public static RegistrySupplier<Block> FLOOR_SHELF_BIRCH;
+    public static List<RegistrySupplier<Block>> SHELVES_BLOCK = new ArrayList<>();
+    public static List<RegistrySupplier<Item>> SHELVES_ITEM = new ArrayList<>();
 
-    public static RegistrySupplier<Block> SHELF_DARK_OAK;
-    public static RegistrySupplier<Block> FLOOR_SHELF_DARK_OAK;
+    public static List<RegistrySupplier<Block>> FLOOR_SHELVES_BLOCK = new ArrayList<>();
+    public static List<RegistrySupplier<Item>> FLOOR_SHELVES_ITEM = new ArrayList<>();
 
-    public static RegistrySupplier<Block> SHELF_SPRUCE;
-    public static RegistrySupplier<Block> FLOOR_SHELF_SPRUCE;
-
-    public static RegistrySupplier<Block> SHELF_JUNGLE;
-    public static RegistrySupplier<Block> FLOOR_SHELF_JUNGLE;
-
-    public static RegistrySupplier<Block> SHELF_MANGROVE;
-    public static RegistrySupplier<Block> FLOOR_SHELF_MANGROVE;
-
-    public static RegistrySupplier<Block> SHELF_BAMBOO;
-    public static RegistrySupplier<Block> FLOOR_SHELF_BAMBOO;
-
-    public static RegistrySupplier<Block> SHELF_WARPED;
-    public static RegistrySupplier<Block> FLOOR_SHELF_WARPED;
-
-    public static RegistrySupplier<Block> SHELF_CHERRY;
-    public static RegistrySupplier<Block> FLOOR_SHELF_CHERRY;
-
-    public static RegistrySupplier<Block> SHELF_CRIMSON;
-    public static RegistrySupplier<Block> FLOOR_SHELF_CRIMSON;
-
-    public static RegistrySupplier<Item> SHELF_ITEM_OAK;
-    public static RegistrySupplier<Item> FLOOR_SHELF_ITEM_OAK;
-
-    public static RegistrySupplier<Item> SHELF_ITEM_ACACIA;
-    public static RegistrySupplier<Item> FLOOR_SHELF_ITEM_ACACIA;
-
-    public static RegistrySupplier<Item> SHELF_ITEM_BIRCH;
-    public static RegistrySupplier<Item> FLOOR_SHELF_ITEM_BIRCH;
-
-    public static RegistrySupplier<Item> SHELF_ITEM_DARK_OAK;
-    public static RegistrySupplier<Item> FLOOR_SHELF_ITEM_DARK_OAK;
-
-    public static RegistrySupplier<Item> SHELF_ITEM_SPRUCE;
-    public static RegistrySupplier<Item> FLOOR_SHELF_ITEM_SPRUCE;
-
-    public static RegistrySupplier<Item> SHELF_ITEM_JUNGLE;
-    public static RegistrySupplier<Item> FLOOR_SHELF_ITEM_JUNGLE;
-
-    public static RegistrySupplier<Item> SHELF_ITEM_MANGROVE;
-    public static RegistrySupplier<Item> FLOOR_SHELF_ITEM_MANGROVE;
-
-    public static RegistrySupplier<Item> SHELF_ITEM_BAMBOO;
-    public static RegistrySupplier<Item> FLOOR_SHELF_ITEM_BAMBOO;
-
-    public static RegistrySupplier<Item> SHELF_ITEM_WARPED;
-    public static RegistrySupplier<Item> FLOOR_SHELF_ITEM_WARPED;
-
-    public static RegistrySupplier<Item> SHELF_ITEM_CHERRY;
-    public static RegistrySupplier<Item> FLOOR_SHELF_ITEM_CHERRY;
-
-    public static RegistrySupplier<Item> SHELF_ITEM_CRIMSON;
-    public static RegistrySupplier<Item> FLOOR_SHELF_ITEM_CRIMSON;
-
-    public static RegistrySupplier<BlockEntityType<ShelfBlockEntity>> SHELF_BLOCK_ENTITY;
-    public static RegistrySupplier<BlockEntityType<FloorShelfBlockEntity>> FLOOR_SHELF_BLOCK_ENTITY;
-
-    public static RegistrySupplier<CreativeModeTab> SHELF_MOD_TAB;
-
-
-    public static List<RegistrySupplier<Item>> SHELVES;
     public static List<JsonObject> SHELVES_JSON;
-    public static List<String> MATERIALS = List.of(
-            "oak",
-            "acacia",
-            "birch",
-            "dark_oak",
-            "spruce",
-            "jungle",
-            "mangrove",
-            "bamboo",
-            "warped",
-            "cherry",
-            "crimson"
-    );
-
 
     public static boolean isShelf(Item item) {
-        for (RegistrySupplier<Item> shelf : SHELVES) {
+        for (RegistrySupplier<Item> shelf : SHELVES_ITEM) {
             if (shelf.get() == item) return true;
         }
+
+        for (RegistrySupplier<Item> shelf : FLOOR_SHELVES_ITEM) {
+            if (shelf.get() == item) return true;
+        }
+
         return false;
     }
 
-    public static JsonObject createShapedRecipeJson(ArrayList<Character> keys, ArrayList<ResourceLocation> items, ArrayList<String> type, ArrayList<String> pattern, ResourceLocation output) {
-        //Creating a new json object, where we will store our recipe.
+    public static JsonObject createShapedRecipeJson(
+            ArrayList<Character> keys,
+            ArrayList<ResourceLocation> items,
+            ArrayList<String> type,
+            ArrayList<String> pattern,
+            ResourceLocation output) {
+
         JsonObject json = new JsonObject();
-        //The "type" of the recipe we are creating. In this case, a shaped recipe.
+
+        // Тип рецепта
         json.addProperty("type", "minecraft:crafting_shaped");
-        //This creates:
-        //"type": "minecraft:crafting_shaped"
 
-        //We create a new Json Element, and add our crafting pattern to it.
+        // Добавляем поле category — его нет в старом коде, но в твоём формате надо
+        json.addProperty("category", "misc");
+
+        // Паттерн
         JsonArray jsonArray = new JsonArray();
-        jsonArray.add(pattern.get(0));
-        jsonArray.add(pattern.get(1));
-        jsonArray.add(pattern.get(2));
-        //Then we add the pattern to our json object.
-        json.add("pattern", jsonArray);
-        //This creates:
-        //"pattern": [
-        //  "###",
-        //  " | ",
-        //  " | "
-        //]
-
-        //Next we need to define what the keys in the pattern are. For this we need different JsonObjects per key definition, and one main JsonObject that will contain all of the defined keys.
-        JsonObject individualKey; //Individual key
-        JsonObject keyList = new JsonObject(); //The main key object, containing all the keys
-
-        for (int i = 0; i < keys.size(); ++i) {
-            individualKey = new JsonObject();
-            individualKey.addProperty(type.get(i), items.get(i).toString()); //This will create a key in the form "type": "input", where type is either "item" or "tag", and input is our input item.
-            keyList.add(keys.get(i) + "", individualKey); //Then we add this key to the main key object.
-            //This will add:
-            //"#": { "tag": "c:copper_ingots" }
-            //and after that
-            //"|": { "item": "minecraft:sticks" }
-            //and so on.
+        for (String line : pattern) {
+            jsonArray.add(line);
         }
+        json.add("pattern", jsonArray);
 
+        // Ключи
+        JsonObject keyList = new JsonObject();
+        for (int i = 0; i < keys.size(); i++) {
+        #if MC_VER >= V1_21_3
+            keyList.addProperty(keys.get(i).toString(), items.get(i).toString());
+        #else
+            JsonObject individualKey = new JsonObject();
+            individualKey.addProperty(type.get(i), items.get(i).toString());
+            keyList.add(keys.get(i).toString(), individualKey);
+        #endif
+        }
         json.add("key", keyList);
-        //And so we get:
-        //"key": {
-        //  "#": {
-        //    "tag": "c:copper_ingots"
-        //  },
-        //  "|": {
-        //    "item": "minecraft:stick"
-        //  }
-        //},
 
-        //Finally, we define our result object
+        // Результат
         JsonObject result = new JsonObject();
-        result.addProperty(#if MC_VER < V1_21 "item" #else "id" #endif, output.toString());
+
+        // Везде используем "id" вместо "item" в результате
+        result.addProperty("id", output.toString());
         result.addProperty("count", 1);
         json.add("result", result);
-        //This creates:
-        //"result": {
-        //  "item": "modid:copper_pickaxe",
-        //  "count": 1
-        //}
 
         return json;
     }
@@ -258,9 +195,147 @@ public final class ShelfModCommon {
         );
     }
 
+    public static List<String> MATERIALS = List.of(
+            "oak",
+            "acacia",
+            "birch",
+            "dark_oak",
+            "spruce",
+            "jungle",
+            #if MC_VER >= V1_19_2 "mangrove",#endif
+            #if MC_VER >= V1_19_4 "bamboo", #endif
+            "warped",
+            #if MC_VER >= V1_19_4 "cherry", #endif
+            "crimson"
+    );
+
+    public static void registerShelves() {
+        for (int i = 0; i < MATERIALS.size(); ++i) {
+            ResourceLocation location = #if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "shelf_" + MATERIALS.get(i));
+            #if MC_VER >= V1_21_3 ResourceKey<Block> shelf_key = ResourceKey.create(Registries.BLOCK, location); #endif
+
+            RegistrySupplier<Block> shelf = blocks.register(
+                    location,
+                    () -> new Shelf(BlockBehaviour.Properties
+                            #if MC_VER <= V1_20_1
+                            .copy
+                            #else
+                            .ofFullCopy
+                            #endif(Blocks.OAK_PLANKS)
+                            #if MC_VER >= V1_21_3
+                            .setId(shelf_key)
+                            #endif
+                    )
+            );
+
+            SHELVES_BLOCK.add(shelf);
+
+            ResourceLocation itemLocation = #if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "shelf_item_" + MATERIALS.get(i));
+            #if MC_VER >= V1_21_3 ResourceKey<Item> shelf_item_key = ResourceKey.create(Registries.ITEM, itemLocation); #endif
+
+            RegistrySupplier<Item> shelf_item = items.register(
+                    itemLocation,
+                    () -> new BlockItem(
+                            shelf.get(),
+                            new Item.Properties()
+                                    #if MC_VER >= V1_19_4
+                                    .arch$tab(SHELF_MOD_TAB)
+                                    #else
+                                    .tab(SHELF_MOD_TAB)
+                                    #endif
+                                    #if MC_VER >= V1_21_3
+                                    .setId(shelf_item_key)
+                                    #endif
+                    )
+            );
+
+            SHELVES_ITEM.add(shelf_item);
+        }
+    }
+
+    public static void registerFloorShelves() {
+        for (int i = 0; i < MATERIALS.size(); ++i) {
+            ResourceLocation location = #if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "floor_shelf_" + MATERIALS.get(i));
+            #if MC_VER >= V1_21_3 ResourceKey<Block> shelf_key = ResourceKey.create(Registries.BLOCK, location); #endif
+
+            RegistrySupplier<Block> floor_shelf = blocks.register(
+                    location,
+                    () -> new FloorShelf(BlockBehaviour.Properties
+                            #if MC_VER <= V1_20_1
+                            .copy
+                            #else
+                            .ofFullCopy
+                            #endif(Blocks.OAK_PLANKS)
+                            #if MC_VER >= V1_21_3
+                            .setId(shelf_key)
+                            #endif
+                    )
+            );
+
+            FLOOR_SHELVES_BLOCK.add(floor_shelf);
+
+            ResourceLocation itemLocation = #if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "floor_shelf_item_" + MATERIALS.get(i));
+            #if MC_VER >= V1_21_3 ResourceKey<Item> floor_shelf_item_key = ResourceKey.create(Registries.ITEM, itemLocation); #endif
+
+            RegistrySupplier<Item> floor_shelf_item = items.register(
+                    itemLocation,
+                    () -> new BlockItem(
+                            floor_shelf.get(),
+                            new Item.Properties()
+                            #if MC_VER >= V1_19_4
+                            .arch$tab(SHELF_MOD_TAB)
+                            #else
+                            .tab(SHELF_MOD_TAB)
+                            #endif
+                            #if MC_VER >= V1_21_3
+                            .setId(floor_shelf_item_key)
+                            #endif
+                    )
+            );
+
+            FLOOR_SHELVES_ITEM.add(floor_shelf_item);
+        }
+    }
+
+
+    public static void generateBlockItemModels(List<RegistrySupplier<Item>> items, List<RegistrySupplier<Block>> blocks) {
+        #if MC_VER >= V1_21_4
+        Path outputPath = Paths.get("resources/assets/" + MODID + "/items");
+        #else
+        Path outputPath = Paths.get("resources/assets/" + MODID + "/models/item");
+        #endif
+
+        try {
+            Files.createDirectories(outputPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        for (int i = 0; i < blocks.size(); ++i) {
+            String filename = items.get(i).get().arch$registryName().getPath();
+            Path file = outputPath.resolve(filename + ".json");
+
+            JsonObject parent = new JsonObject();
+            #if MC_VER >= V1_21_4
+
+            JsonObject info = new JsonObject();
+
+            info.addProperty("type", "minecraft:model");
+            info.addProperty("model", MODID + ":block/" + blocks.get(i).get().arch$registryName().getPath());
+
+            parent.add("model", info);
+            #else
+            parent.addProperty("parent", MODID + ":block/" + blocks.get(i).get().arch$registryName().getPath());
+            #endif
+
+            String modelPath = "resources/assets/" + ShelfModCommon.MODID + "/models/item/" + filename + ".json";
+        }
+    }
+
 
     public static void initializeServer() {
-        ICON = items.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "icon"), () -> new Item(new Item.Properties()));
+        #if MC_VER >= V1_21_3 ResourceKey<Item> iconKey = ResourceKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(MODID, "icon")); #endif
+        ICON = items.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "icon"), () -> new Item(new Item.Properties() #if MC_VER >= V1_21_3 .setId(iconKey) #endif));
 
         #if MC_VER >= V1_20_1
         SHELF_MOD_TAB = itemGroups.register(
@@ -271,86 +346,22 @@ public final class ShelfModCommon {
                 )
         );
         #else
-        #if MC_VER == V1_19_4 CreativeTabRegistry.TabSupplier #else CreativeModeTab #endif
         SHELF_MOD_TAB = CreativeTabRegistry.create(
                 new ResourceLocation(MODID, "shelf_mod_tab"),
                 () -> ICON.get().asItem().getDefaultInstance()
         );
         #endif
 
-        SHELF_OAK = blocks.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "shelf_oak"), () -> new Shelf(BlockBehaviour.Properties#if MC_VER <= V1_20_1 .copy #else .ofFullCopy #endif(Blocks.OAK_PLANKS)));
-        FLOOR_SHELF_OAK = blocks.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "floor_shelf_oak"), () -> new FloorShelf(BlockBehaviour.Properties#if MC_VER <= V1_20_1 .copy #else .ofFullCopy #endif(Blocks.OAK_PLANKS)));
 
-        SHELF_ACACIA = blocks.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "shelf_acacia"), () -> new Shelf(BlockBehaviour.Properties#if MC_VER <= V1_20_1 .copy #else .ofFullCopy #endif(Blocks.OAK_PLANKS)));
-        FLOOR_SHELF_ACACIA = blocks.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "floor_shelf_acacia"), () -> new FloorShelf(BlockBehaviour.Properties#if MC_VER <= V1_20_1 .copy #else .ofFullCopy #endif(Blocks.OAK_PLANKS)));
+        registerShelves();
+        registerFloorShelves();
 
-        SHELF_BIRCH = blocks.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "shelf_birch"), () -> new Shelf(BlockBehaviour.Properties#if MC_VER <= V1_20_1 .copy #else .ofFullCopy #endif(Blocks.OAK_PLANKS)));
-        FLOOR_SHELF_BIRCH = blocks.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "floor_shelf_birch"), () -> new FloorShelf(BlockBehaviour.Properties#if MC_VER <= V1_20_1 .copy #else .ofFullCopy #endif(Blocks.OAK_PLANKS)));
-
-        SHELF_DARK_OAK = blocks.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "shelf_dark_oak"), () -> new Shelf(BlockBehaviour.Properties#if MC_VER <= V1_20_1 .copy #else .ofFullCopy #endif(Blocks.OAK_PLANKS)));
-        FLOOR_SHELF_DARK_OAK = blocks.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "floor_shelf_dark_oak"), () -> new FloorShelf(BlockBehaviour.Properties#if MC_VER <= V1_20_1 .copy #else .ofFullCopy #endif(Blocks.OAK_PLANKS)));
-
-        SHELF_SPRUCE = blocks.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "shelf_spruce"), () -> new Shelf(BlockBehaviour.Properties#if MC_VER <= V1_20_1 .copy #else .ofFullCopy #endif(Blocks.OAK_PLANKS)));
-        FLOOR_SHELF_SPRUCE = blocks.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "floor_shelf_spruce"), () -> new FloorShelf(BlockBehaviour.Properties#if MC_VER <= V1_20_1 .copy #else .ofFullCopy #endif(Blocks.OAK_PLANKS)));
-
-        SHELF_JUNGLE = blocks.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "shelf_jungle"), () -> new Shelf(BlockBehaviour.Properties#if MC_VER <= V1_20_1 .copy #else .ofFullCopy #endif(Blocks.OAK_PLANKS)));
-        FLOOR_SHELF_JUNGLE = blocks.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "floor_shelf_jungle"), () -> new FloorShelf(BlockBehaviour.Properties#if MC_VER <= V1_20_1 .copy #else .ofFullCopy #endif(Blocks.OAK_PLANKS)));
-
-        SHELF_MANGROVE = blocks.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "shelf_mangrove"), () -> new Shelf(BlockBehaviour.Properties#if MC_VER <= V1_20_1 .copy #else .ofFullCopy #endif(Blocks.OAK_PLANKS)));
-        FLOOR_SHELF_MANGROVE = blocks.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "floor_shelf_mangrove"), () -> new FloorShelf(BlockBehaviour.Properties#if MC_VER <= V1_20_1 .copy #else .ofFullCopy #endif(Blocks.OAK_PLANKS)));
-
-        SHELF_BAMBOO = blocks.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "shelf_bamboo"), () -> new Shelf(BlockBehaviour.Properties#if MC_VER <= V1_20_1 .copy #else .ofFullCopy #endif(Blocks.OAK_PLANKS)));
-        FLOOR_SHELF_BAMBOO = blocks.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "floor_shelf_bamboo"), () -> new FloorShelf(BlockBehaviour.Properties#if MC_VER <= V1_20_1 .copy #else .ofFullCopy #endif(Blocks.OAK_PLANKS)));
-
-        SHELF_WARPED = blocks.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "shelf_warped"), () -> new Shelf(BlockBehaviour.Properties#if MC_VER <= V1_20_1 .copy #else .ofFullCopy #endif(Blocks.OAK_PLANKS)));
-        FLOOR_SHELF_WARPED = blocks.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "floor_shelf_warped"), () -> new FloorShelf(BlockBehaviour.Properties#if MC_VER <= V1_20_1 .copy #else .ofFullCopy #endif(Blocks.OAK_PLANKS)));
-
-        SHELF_CHERRY = blocks.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "shelf_cherry"), () -> new Shelf(BlockBehaviour.Properties#if MC_VER <= V1_20_1 .copy #else .ofFullCopy #endif(Blocks.OAK_PLANKS)));
-        FLOOR_SHELF_CHERRY = blocks.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "floor_shelf_cherry"), () -> new FloorShelf(BlockBehaviour.Properties#if MC_VER <= V1_20_1 .copy #else .ofFullCopy #endif(Blocks.OAK_PLANKS)));
-
-        SHELF_CRIMSON = blocks.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "shelf_crimson"), () -> new Shelf(BlockBehaviour.Properties#if MC_VER <= V1_20_1 .copy #else .ofFullCopy #endif(Blocks.OAK_PLANKS)));
-        FLOOR_SHELF_CRIMSON = blocks.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "floor_shelf_crimson"), () -> new FloorShelf(BlockBehaviour.Properties#if MC_VER <= V1_20_1 .copy #else .ofFullCopy #endif(Blocks.OAK_PLANKS)));
-
-
-        SHELF_ITEM_OAK = items.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "shelf_item_oak"), () -> new BlockItem(SHELF_OAK.get(), new Item.Properties()#if MC_VER >= V1_19_4 .arch$tab(SHELF_MOD_TAB) #else .tab(SHELF_MOD_TAB) #endif));
-        FLOOR_SHELF_ITEM_OAK = items.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "floor_shelf_item_oak"), () -> new BlockItem(FLOOR_SHELF_OAK.get(), new Item.Properties()#if MC_VER >= V1_19_4 .arch$tab(SHELF_MOD_TAB) #else .tab(SHELF_MOD_TAB) #endif));
-
-        SHELF_ITEM_ACACIA = items.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "shelf_item_acacia"), () -> new BlockItem(SHELF_ACACIA.get(), new Item.Properties()#if MC_VER >= V1_19_4 .arch$tab(SHELF_MOD_TAB) #else .tab(SHELF_MOD_TAB) #endif));
-        FLOOR_SHELF_ITEM_ACACIA = items.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "floor_shelf_item_acacia"), () -> new BlockItem(FLOOR_SHELF_ACACIA.get(), new Item.Properties()#if MC_VER >= V1_19_4 .arch$tab(SHELF_MOD_TAB) #else .tab(SHELF_MOD_TAB) #endif));
-
-        SHELF_ITEM_BIRCH = items.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "shelf_item_birch"), () -> new BlockItem(SHELF_BIRCH.get(), new Item.Properties()#if MC_VER >= V1_19_4 .arch$tab(SHELF_MOD_TAB) #else .tab(SHELF_MOD_TAB) #endif));
-        FLOOR_SHELF_ITEM_BIRCH = items.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "floor_shelf_item_birch"), () -> new BlockItem(FLOOR_SHELF_BIRCH.get(), new Item.Properties()#if MC_VER >= V1_19_4 .arch$tab(SHELF_MOD_TAB) #else .tab(SHELF_MOD_TAB) #endif));
-
-        SHELF_ITEM_DARK_OAK = items.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "shelf_item_dark_oak"), () -> new BlockItem(SHELF_DARK_OAK.get(), new Item.Properties()#if MC_VER >= V1_19_4 .arch$tab(SHELF_MOD_TAB) #else .tab(SHELF_MOD_TAB) #endif));
-        FLOOR_SHELF_ITEM_DARK_OAK = items.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "floor_shelf_item_dark_oak"), () -> new BlockItem(FLOOR_SHELF_DARK_OAK.get(), new Item.Properties()#if MC_VER >= V1_19_4 .arch$tab(SHELF_MOD_TAB) #else .tab(SHELF_MOD_TAB) #endif));
-
-        SHELF_ITEM_SPRUCE = items.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "shelf_item_spruce"), () -> new BlockItem(SHELF_SPRUCE.get(), new Item.Properties()#if MC_VER >= V1_19_4 .arch$tab(SHELF_MOD_TAB) #else .tab(SHELF_MOD_TAB) #endif));
-        FLOOR_SHELF_ITEM_SPRUCE = items.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "floor_shelf_item_spruce"), () -> new BlockItem(FLOOR_SHELF_SPRUCE.get(), new Item.Properties()#if MC_VER >= V1_19_4 .arch$tab(SHELF_MOD_TAB) #else .tab(SHELF_MOD_TAB) #endif));
-
-        SHELF_ITEM_JUNGLE = items.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "shelf_item_jungle"), () -> new BlockItem(SHELF_JUNGLE.get(), new Item.Properties()#if MC_VER >= V1_19_4 .arch$tab(SHELF_MOD_TAB) #else .tab(SHELF_MOD_TAB) #endif));
-        FLOOR_SHELF_ITEM_JUNGLE = items.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "floor_shelf_item_jungle"), () -> new BlockItem(FLOOR_SHELF_JUNGLE.get(), new Item.Properties()#if MC_VER >= V1_19_4 .arch$tab(SHELF_MOD_TAB) #else .tab(SHELF_MOD_TAB) #endif));
-
-        SHELF_ITEM_MANGROVE = items.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "shelf_item_mangrove"), () -> new BlockItem(SHELF_MANGROVE.get(), new Item.Properties()#if MC_VER >= V1_19_4 .arch$tab(SHELF_MOD_TAB) #else .tab(SHELF_MOD_TAB) #endif));
-        FLOOR_SHELF_ITEM_MANGROVE = items.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "floor_shelf_item_mangrove"), () -> new BlockItem(FLOOR_SHELF_MANGROVE.get(), new Item.Properties()#if MC_VER >= V1_19_4 .arch$tab(SHELF_MOD_TAB) #else .tab(SHELF_MOD_TAB) #endif));
-
-        SHELF_ITEM_BAMBOO = items.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "shelf_item_bamboo"), () -> new BlockItem(SHELF_BAMBOO.get(), new Item.Properties()#if MC_VER >= V1_19_4 .arch$tab(SHELF_MOD_TAB) #else .tab(SHELF_MOD_TAB) #endif));
-        FLOOR_SHELF_ITEM_BAMBOO = items.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "floor_shelf_item_bamboo"), () -> new BlockItem(FLOOR_SHELF_BAMBOO.get(), new Item.Properties()#if MC_VER >= V1_19_4 .arch$tab(SHELF_MOD_TAB) #else .tab(SHELF_MOD_TAB) #endif));
-
-        SHELF_ITEM_WARPED = items.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "shelf_item_warped"), () -> new BlockItem(SHELF_WARPED.get(), new Item.Properties()#if MC_VER >= V1_19_4 .arch$tab(SHELF_MOD_TAB) #else .tab(SHELF_MOD_TAB) #endif));
-        FLOOR_SHELF_ITEM_WARPED = items.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "floor_shelf_item_warped"), () -> new BlockItem(FLOOR_SHELF_WARPED.get(), new Item.Properties()#if MC_VER >= V1_19_4 .arch$tab(SHELF_MOD_TAB) #else .tab(SHELF_MOD_TAB) #endif));
-
-        SHELF_ITEM_CHERRY = items.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "shelf_item_cherry"), () -> new BlockItem(SHELF_CHERRY.get(), new Item.Properties()#if MC_VER >= V1_19_4 .arch$tab(SHELF_MOD_TAB) #else .tab(SHELF_MOD_TAB) #endif));
-        FLOOR_SHELF_ITEM_CHERRY = items.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "floor_shelf_item_cherry"), () -> new BlockItem(FLOOR_SHELF_CHERRY.get(), new Item.Properties()#if MC_VER >= V1_19_4 .arch$tab(SHELF_MOD_TAB) #else .tab(SHELF_MOD_TAB) #endif));
-
-        SHELF_ITEM_CRIMSON = items.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "shelf_item_crimson"), () -> new BlockItem(SHELF_CRIMSON.get(), new Item.Properties()#if MC_VER >= V1_19_4 .arch$tab(SHELF_MOD_TAB) #else .tab(SHELF_MOD_TAB) #endif));
-        FLOOR_SHELF_ITEM_CRIMSON = items.register(#if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "floor_shelf_item_crimson"), () -> new BlockItem(FLOOR_SHELF_CRIMSON.get(), new Item.Properties()#if MC_VER >= V1_19_4 .arch$tab(SHELF_MOD_TAB) #else .tab(SHELF_MOD_TAB) #endif));
-
-
+        #if MC_VER < V1_21_3
         SHELF_BLOCK_ENTITY = blockEntities.register(
                 #if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "shelf_block_entity"),
                 () -> BlockEntityType.Builder.of(
                         ShelfBlockEntity::new,
-                        SHELF_OAK.get(), SHELF_ACACIA.get(), SHELF_BIRCH.get(), SHELF_DARK_OAK.get(), SHELF_SPRUCE.get(), SHELF_JUNGLE.get(), SHELF_MANGROVE.get(), SHELF_BAMBOO.get(), SHELF_WARPED.get(), SHELF_CHERRY.get(), SHELF_CRIMSON.get()
+                        SHELVES_BLOCK.stream().map(RegistrySupplier::get).toArray(Block[]::new)
                 ).build(null)
         );
 
@@ -358,34 +369,10 @@ public final class ShelfModCommon {
                 #if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(MODID, "floor_shelf_block_entity"),
                 () -> BlockEntityType.Builder.of(
                         FloorShelfBlockEntity::new,
-                        FLOOR_SHELF_OAK.get(), FLOOR_SHELF_ACACIA.get(), FLOOR_SHELF_BIRCH.get(), FLOOR_SHELF_DARK_OAK.get(), FLOOR_SHELF_SPRUCE.get(), FLOOR_SHELF_JUNGLE.get(), FLOOR_SHELF_MANGROVE.get(), FLOOR_SHELF_BAMBOO.get(), FLOOR_SHELF_WARPED.get(), FLOOR_SHELF_CHERRY.get(), FLOOR_SHELF_CRIMSON.get()
+                        FLOOR_SHELVES_BLOCK.stream().map(RegistrySupplier::get).toArray(Block[]::new)
                 ).build(null)
         );
-
-        SHELVES = List.of(
-                SHELF_ITEM_OAK,
-                FLOOR_SHELF_ITEM_OAK,
-                SHELF_ITEM_ACACIA,
-                FLOOR_SHELF_ITEM_ACACIA,
-                SHELF_ITEM_BIRCH,
-                FLOOR_SHELF_ITEM_BIRCH,
-                SHELF_ITEM_DARK_OAK,
-                FLOOR_SHELF_ITEM_DARK_OAK,
-                SHELF_ITEM_SPRUCE,
-                FLOOR_SHELF_ITEM_SPRUCE,
-                SHELF_ITEM_JUNGLE,
-                FLOOR_SHELF_ITEM_JUNGLE,
-                SHELF_ITEM_MANGROVE,
-                FLOOR_SHELF_ITEM_MANGROVE,
-                SHELF_ITEM_BAMBOO,
-                FLOOR_SHELF_ITEM_BAMBOO,
-                SHELF_ITEM_WARPED,
-                FLOOR_SHELF_ITEM_WARPED,
-                SHELF_ITEM_CHERRY,
-                FLOOR_SHELF_ITEM_CHERRY,
-                SHELF_ITEM_CRIMSON,
-                FLOOR_SHELF_ITEM_CRIMSON
-        );
+        #endif
 
         SHELVES_JSON = new ArrayList<>();
 
