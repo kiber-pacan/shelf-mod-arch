@@ -206,6 +206,7 @@ public final class ShelfModCommon {
             #if MC_VER >= V1_19_4 "bamboo", #endif
             "warped",
             #if MC_VER >= V1_19_4 "cherry", #endif
+            #if MC_VER >= V1_21_4 "pale_oak", #endif
             "crimson"
     );
 
