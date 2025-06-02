@@ -4,11 +4,12 @@ license = "${license}"
 
 [[mods]]
 modId = "${modid}"
-version = "${version}"
+version = "${mod_version}"
 displayName = "${name}"
 authors = "${authors}"
-description = "${description}"
-
+description = '''
+${description}
+'''
 logoFile = "icon.png"
 
 [[dependencies."${modid}"]]
