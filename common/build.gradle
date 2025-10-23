@@ -16,6 +16,9 @@ dependencies {
 
     modImplementation "dev.architectury:architectury:$rootProject.architectury_api_version"
 
+    modImplementation "net.fabricmc.fabric-api:fabric-api:$rootProject.fabric_api_version"
+
+
     if (rootProject.hasProperty("yacl_version")) {
         modImplementation "dev.isxander:yet-another-config-lib:${project.yacl_version}+${rootProject.minecraft_version}-fabric"
     } else if(rootProject.hasProperty("midnightlib_version")) {

@@ -85,7 +85,6 @@ public final class ShelfModCommon {
 
 
     public static RegistrySupplier<Item> ICON;
-
     public static #if MC_VER >= V1_21_3 BlockEntityType<ShelfBlockEntity> #else RegistrySupplier<BlockEntityType<ShelfBlockEntity>> #endif SHELF_BLOCK_ENTITY;
     public static #if MC_VER >= V1_21_3 BlockEntityType<FloorShelfBlockEntity> #else RegistrySupplier<BlockEntityType<FloorShelfBlockEntity>> #endif FLOOR_SHELF_BLOCK_ENTITY;
 
@@ -120,20 +119,16 @@ public final class ShelfModCommon {
 
         JsonObject json = new JsonObject();
 
-        // Тип рецепта
         json.addProperty("type", "minecraft:crafting_shaped");
 
-        // Добавляем поле category — его нет в старом коде, но в твоём формате надо
         json.addProperty("category", "misc");
 
-        // Паттерн
         JsonArray jsonArray = new JsonArray();
         for (String line : pattern) {
             jsonArray.add(line);
         }
         json.add("pattern", jsonArray);
 
-        // Ключи
         JsonObject keyList = new JsonObject();
         for (int i = 0; i < keys.size(); i++) {
         #if MC_VER >= V1_21_3
@@ -146,10 +141,8 @@ public final class ShelfModCommon {
         }
         json.add("key", keyList);
 
-        // Результат
         JsonObject result = new JsonObject();
 
-        // Везде используем "id" вместо "item" в результате
         result.addProperty("id", output.toString());
         result.addProperty("count", 1);
         json.add("result", result);
