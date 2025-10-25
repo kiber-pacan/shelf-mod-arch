@@ -31,15 +31,18 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 
-#if MC_VER >= V1_21
+
 import dev.architectury.registry.registries.RegistrarManager;
+import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+import net.minecraft.world.level.material.MapColor;
 import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;
-#endif
+
 
 #if MC_VER >= V1_19_4
 import dev.architectury.registry.registries.RegistrarManager;
@@ -143,7 +146,7 @@ public final class ShelfModCommon {
 
         JsonObject result = new JsonObject();
 
-        result.addProperty("id", output.toString());
+        result.addProperty(#if MC_VER > V1_20_4 "id" #else "item" #endif, output.toString());
         result.addProperty("count", 1);
         json.add("result", result);
 
@@ -210,15 +213,8 @@ public final class ShelfModCommon {
 
             RegistrySupplier<Block> shelf = blocks.register(
                     location,
-                    () -> new Shelf(BlockBehaviour.Properties
-                            #if MC_VER <= V1_20_1
-                            .copy
-                            #else
-                            .ofFullCopy
-                            #endif(Blocks.OAK_PLANKS)
-                            #if MC_VER >= V1_21_3
-                            .setId(shelf_key)
-                            #endif
+                    () -> new Shelf(
+                            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_YELLOW).instrument(NoteBlockInstrument.BASS).strength(0.5F, 3.0F).sound(SoundType.BAMBOO_WOOD).ignitedByLava()
                     )
             );
 
@@ -254,15 +250,8 @@ public final class ShelfModCommon {
 
             RegistrySupplier<Block> floor_shelf = blocks.register(
                     location,
-                    () -> new FloorShelf(BlockBehaviour.Properties
-                            #if MC_VER <= V1_20_1
-                            .copy
-                            #else
-                            .ofFullCopy
-                            #endif(Blocks.OAK_PLANKS)
-                            #if MC_VER >= V1_21_3
-                            .setId(shelf_key)
-                            #endif
+                    () -> new FloorShelf(
+                            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_YELLOW).instrument(NoteBlockInstrument.BASS).strength(0.5F, 3.0F).sound(SoundType.BAMBOO_WOOD).ignitedByLava()
                     )
             );
 

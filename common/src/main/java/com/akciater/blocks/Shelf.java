@@ -141,7 +141,7 @@ public class Shelf extends BaseEntityBlock implements SimpleWaterloggedBlock {
                 }
             }
 
-            Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), state.getBlock().asItem().getDefaultInstance());
+            //Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), state.getBlock().asItem().getDefaultInstance());
             super.onRemove(state, level, pos, newState, movedByPiston);
         }
     }

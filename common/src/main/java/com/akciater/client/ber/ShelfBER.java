@@ -52,10 +52,10 @@ package com.akciater.client.ber;
 public class ShelfBER implements BlockEntityRenderer<ShelfBlockEntity> {
     public List<Vec3> itemPositions = new ArrayList<>(
             List.of(
-                    new Vec3(0.265625F, 0.265625F, 0.75F),
-                    new Vec3(0.734375F, 0.265625F, 0.75F),
-                    new Vec3(0.265625F, 0.734375F, 0.75F),
-                    new Vec3(0.734375F, 0.734375F, 0.75F)
+                    new Vec3(0.265625F, 0.265625F, 0.5625F),
+                    new Vec3(0.734375F, 0.265625F, 0.5625F),
+                    new Vec3(0.265625F, 0.734375F, 0.5625F),
+                    new Vec3(0.734375F, 0.734375F, 0.5625F)
             )
     );
 

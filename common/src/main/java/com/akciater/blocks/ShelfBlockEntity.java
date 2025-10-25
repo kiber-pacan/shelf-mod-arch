@@ -3,7 +3,6 @@ package com.akciater.blocks;
 
 
 
-#if MC_VER >= V1_21
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
@@ -15,7 +14,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-#endif
+
 
 import static com.akciater.ShelfModCommon.SHELF_BLOCK_ENTITY;
 
