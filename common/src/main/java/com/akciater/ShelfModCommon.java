@@ -11,7 +11,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import com.mojang.logging.LogUtils;
+
+#if MC_VER >= V1_18_2 import com.mojang.logging.LogUtils; #endif
 import dev.architectury.platform.Platform;
 import dev.architectury.registry.CreativeTabRegistry;
 import dev.architectury.registry.ReloadListenerRegistry;
@@ -36,13 +37,20 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 
 
-import dev.architectury.registry.registries.RegistrarManager;
-import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
-import net.minecraft.world.level.material.MapColor;
+
+
+
 import org.apache.logging.log4j.LogManager;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;
 
+#if MC_VER <= V1_19_4
+import net.minecraft.world.level.material.Material;
+#endif
+
+#if MC_VER > V1_19_4
+import net.minecraft.world.level.material.MapColor;
+#endif
 
 #if MC_VER >= V1_19_4
 import dev.architectury.registry.registries.RegistrarManager;
@@ -81,10 +89,12 @@ public final class ShelfModCommon {
 
     #else
         public static final Supplier<Registries> MANAGER = Suppliers.memoize(() -> Registries.get(MODID));
-        public static final Registrar<Block> blocks = MANAGER.get().get(Registry.BLOCK);
-        public static final Registrar<Item> items = MANAGER.get().get(Registry.ITEM);
-        public static final Registrar<BlockEntityType<?>> blockEntities = MANAGER.get().get(Registry.BLOCK_ENTITY_TYPE);
+        public static final Registrar<Block> blocks = MANAGER.get().get(Registry.BLOCK_REGISTRY);
+        public static final Registrar<Item> items = MANAGER.get().get(Registry.ITEM_REGISTRY);
+        public static final Registrar<BlockEntityType<?>> blockEntities = MANAGER.get().get(Registry.BLOCK_ENTITY_TYPE_REGISTRY);
     #endif
+
+
 
 
     public static RegistrySupplier<Item> ICON;
@@ -214,7 +224,7 @@ public final class ShelfModCommon {
             RegistrySupplier<Block> shelf = blocks.register(
                     location,
                     () -> new Shelf(
-                            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_YELLOW).instrument(NoteBlockInstrument.BASS).strength(0.5F, 3.0F).sound(SoundType.BAMBOO_WOOD).ignitedByLava()
+                            BlockBehaviour.Properties.of(#if MC_VER <= V1_19_4 Material.WOOD #endif).strength(0.5F, 3.0F).sound(SoundType.WOOD)
                     )
             );
 
@@ -251,7 +261,7 @@ public final class ShelfModCommon {
             RegistrySupplier<Block> floor_shelf = blocks.register(
                     location,
                     () -> new FloorShelf(
-                            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_YELLOW).instrument(NoteBlockInstrument.BASS).strength(0.5F, 3.0F).sound(SoundType.BAMBOO_WOOD).ignitedByLava()
+                            BlockBehaviour.Properties.of(#if MC_VER <= V1_19_4 Material.WOOD #endif).strength(0.5F, 3.0F).sound(SoundType.WOOD)
                     )
             );
 
@@ -295,7 +305,7 @@ public final class ShelfModCommon {
         }
 
         for (int i = 0; i < blocks.size(); ++i) {
-            String filename = items.get(i).get().arch$registryName().getPath();
+            String filename = items.get(i).get()#if MC_VER >= V1_18_2 .arch$registryName().getPath() #else .getDefaultInstance().toString() #endif;
             Path file = outputPath.resolve(filename + ".json");
 
             JsonObject parent = new JsonObject();
@@ -308,7 +318,7 @@ public final class ShelfModCommon {
 
             parent.add("model", info);
             #else
-            parent.addProperty("parent", MODID + ":block/" + blocks.get(i).get().arch$registryName().getPath());
+            parent.addProperty("parent", MODID + ":block/" + blocks.get(i).get()#if MC_VER >= V1_18_2 .arch$registryName().getPath() #else .toString() #endif);
             #endif
 
             String modelPath = "resources/assets/" + ShelfModCommon.MODID + "/models/item/" + filename + ".json";

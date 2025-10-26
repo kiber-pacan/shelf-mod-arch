@@ -4,7 +4,7 @@ import com.akciater.ShelfModCommon;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.gson.*;
-import com.mojang.logging.LogUtils;
+#if MC_VER >= V1_18_2 import com.mojang.logging.LogUtils; #endif
 import com.mojang.serialization.JsonOps;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
@@ -19,10 +19,9 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.crafting.Recipe;
-#if MC_VER >= V1_21_3
+#if MC_VER >= V1_20_4
 import net.minecraft.world.item.crafting.RecipeHolder;
 #endif
-import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
 
 import net.minecraft.world.item.crafting.RecipeType;
@@ -70,6 +69,7 @@ public class RecipeManagerMixin {
 
     private static final java.util.logging.Logger shelfmod$LOGGER = Logger.getLogger("ShelfMod");
 
+    #if MC_VER >= V1_21_3
     @Shadow @Final private static Gson GSON;
     @Shadow @Final private static org.slf4j.Logger LOGGER;
     @Shadow private Map<RecipeType<?>, Map<ResourceLocation, RecipeHolder<?>>> recipes;
@@ -78,7 +78,7 @@ public class RecipeManagerMixin {
 
     @Shadow
     public void replaceRecipes(Iterable<RecipeHolder<?>> recipes) {
-
+    }
     }
 
     @Shadow
@@ -90,9 +90,7 @@ public class RecipeManagerMixin {
     protected static RecipeHolder<?> fromJson(ResourceLocation id, JsonObject json) {
         return null;
     }
-
-
-
+    #endif
 
     #if MC_VER >= V1_21_3
     @Inject(method = "apply(Lnet/minecraft/world/item/crafting/RecipeMap;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V", at = @At("TAIL"))
@@ -112,7 +110,6 @@ public class RecipeManagerMixin {
                 registries1 = null;
             }
             if (registries1 == null) {
-                // не меняем ничего, пропускаем дальше оригинал
                 return;
             }
 
@@ -146,7 +143,6 @@ public class RecipeManagerMixin {
             apply(newMap, resourceManager, profiler);
         }
         #else
-        // Добавляем свои рецепты из JSON
         for (int i = 0; i < MATERIALS.size(); i++) {
             ResourceLocation shelfId = #if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(ShelfModCommon.MODID, "shelf_item_" + ShelfModCommon.MATERIALS.get(i));
             ResourceLocation floorShelfId = #if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(ShelfModCommon.MODID, "floor_shelf_item_" + ShelfModCommon.MATERIALS.get(i));

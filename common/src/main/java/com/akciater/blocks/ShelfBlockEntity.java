@@ -4,7 +4,7 @@ package com.akciater.blocks;
 
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
+#if MC_VER >= V1_21 import net.minecraft.core.HolderLookup; #endif
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;

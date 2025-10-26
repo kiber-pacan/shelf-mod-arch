@@ -1,4 +1,4 @@
-package com.akciater.forge.client;
+package com.akciater.forgeShelfMod.client;
 
 import com.akciater.ShelfModCommon;
 import com.akciater.client.ber.FloorShelfBER;
@@ -12,7 +12,7 @@ import net.minecraftforge.fml.common.Mod;
 import static com.akciater.ShelfModCommon.MODID;
 
 
-@Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ShelfModEventHandler {
     @SubscribeEvent
     public static void registerBER(EntityRenderersEvent.RegisterRenderers event) {
