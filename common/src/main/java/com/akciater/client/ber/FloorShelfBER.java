@@ -28,6 +28,7 @@ package com.akciater.client.ber;
     import com.akciater.blocks.FloorShelfBlockEntity;
     import com.mojang.blaze3d.vertex.PoseStack;
     import com.mojang.math.Quaternion;
+    import com.mojang.math.Vector3f;
     import net.minecraft.client.Minecraft;
     import net.minecraft.client.renderer.MultiBufferSource;
     import net.minecraft.client.renderer.block.model.ItemTransforms;
@@ -69,10 +70,10 @@ public class FloorShelfBER implements BlockEntityRenderer<FloorShelfBlockEntity>
             #else
             case DOWN -> null;
             case UP -> null;
-            case NORTH -> new Quaternion(0,(float) Math.toRadians(0),0,0);
-            case EAST -> new Quaternion(0,(float) Math.toRadians(180),0,0);
-            case SOUTH -> new Quaternion(0,(float) Math.toRadians(270),0,0);
-            case WEST -> new Quaternion(0,(float) Math.toRadians(90),0,0);
+            case NORTH -> Vector3f.XP.rotationDegrees(0);
+            case EAST -> Vector3f.XP.rotationDegrees(-270);
+            case SOUTH -> Vector3f.YP.rotationDegrees(180);
+            case WEST -> Vector3f.YP.rotationDegrees(90);
             #endif
         };
     }
@@ -114,7 +115,7 @@ public class FloorShelfBER implements BlockEntityRenderer<FloorShelfBlockEntity>
                     poseStack.mulPose(Axis.XP.rotationDegrees(90));
                     itemRenderer.renderStatic(stack, #if MC_VER >= V1_19_4 ItemDisplayContext.FIXED #else ItemTransforms.TransformType.FIXED #endif, packedLight, packedOverlay, poseStack, buffer #if MC_VER >= V1_19_4, entity.getLevel() #endif, 1);
                 #else
-                    poseStack.mulPose(new Quaternion((float) Math.toRadians(90), 0, 0, 0));
+                    poseStack.mulPose(Vector3f.XP.rotationDegrees(90));
                     itemRenderer.renderStatic(stack, #if MC_VER >= V1_19_4 ItemDisplayContext.FIXED #else ItemTransforms.TransformType.FIXED #endif, packedLight, packedOverlay, poseStack, buffer #if MC_VER >= V1_19_4, entity.getLevel() #endif, 1);
                 #endif
 
