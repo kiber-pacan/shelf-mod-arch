@@ -97,7 +97,7 @@ subprojects {
                 java : project.java_version,
                 name : "Shelf mod",
                 modid : project.archives_name,
-                description : "Mod that lets you place items on any block side",
+                description : "SHELVES!!!",
                 authors : "akicater",
                 license : "MIT",
                 sources : "https://github.com/kiber-pacan/she"
