@@ -138,7 +138,7 @@ public class #if MC_VER >= V1_21_9 ShelfBER implements BlockEntityRenderer<Shelf
     @Override
     public void submit(ShelfBERS renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState)
     #else
-        public void render(#if MC_VER < V1_21_5 ShelfBlockEntity entity, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay #else FloorShelfBlockEntity entity, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay, Vec3 cameraPos #endif)
+        public void render(#if MC_VER < V1_21_5 ShelfBlockEntity entity, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay #else ShelfBlockEntity entity, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay, Vec3 cameraPos #endif)
     #endif
     {
         #if MC_VER < V1_21_9
