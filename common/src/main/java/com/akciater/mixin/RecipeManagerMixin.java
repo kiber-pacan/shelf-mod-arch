@@ -1,22 +1,15 @@
 package com.akciater.mixin;
 
 import com.akciater.ShelfModCommon;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.google.gson.*;
-#if MC_VER >= V1_18_2 import com.mojang.logging.LogUtils; #endif
-import com.mojang.serialization.JsonOps;
-import net.minecraft.Util;
-import net.minecraft.client.Minecraft;
+#if MC_VER >= V1_18_2
 #if MC_VER >= V1_19_4
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.Registries;
 #endif
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.crafting.Recipe;
 #if MC_VER >= V1_20_4
@@ -27,24 +20,20 @@ import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeType;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.util.perf.Profiler;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
-import static com.akciater.ShelfModCommon.*;
 
 #if MC_VER >= V1_21_3
 import net.minecraft.world.item.crafting.RecipeMap;
+#endif
 #endif
 
 @Mixin(RecipeManager.class)
@@ -60,6 +49,7 @@ public class RecipeManagerMixin {
     protected void apply(RecipeMap object, ResourceManager resourceManager, ProfilerFiller profiler) {
         throw new UnsupportedOperationException("Shadow method");
     }
+
     @Final
     @Shadow
     private HolderLookup.Provider registries;
@@ -69,36 +59,15 @@ public class RecipeManagerMixin {
 
     private static final java.util.logging.Logger shelfmod$LOGGER = Logger.getLogger("ShelfMod");
 
-    #if MC_VER >= V1_21_3
-    @Shadow @Final private static Gson GSON;
-    @Shadow @Final private static org.slf4j.Logger LOGGER;
-    @Shadow private Map<RecipeType<?>, Map<ResourceLocation, RecipeHolder<?>>> recipes;
-    @Shadow private Map<ResourceLocation, RecipeHolder<?>> byName;
-    @Shadow private boolean hasErrors;
-
-    @Shadow
-    public void replaceRecipes(Iterable<RecipeHolder<?>> recipes) {
-    }
-    }
-
-    @Shadow
-    public Collection<RecipeHolder<?>> getRecipes() {
-        return null;
-    }
-
-    @Shadow
-    protected static RecipeHolder<?> fromJson(ResourceLocation id, JsonObject json) {
-        return null;
-    }
-    #endif
 
     #if MC_VER >= V1_21_3
     @Inject(method = "apply(Lnet/minecraft/world/item/crafting/RecipeMap;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V", at = @At("TAIL"))
-    public void interceptApply(RecipeMap object, ResourceManager resourceManager, ProfilerFiller profiler, CallbackInfo ci) {
+    public void interceptApply(RecipeMap object, ResourceManager resourceManager, ProfilerFiller profiler, CallbackInfo ci)
     #else
     @Inject(method = "apply(Ljava/util/Map;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V", at = @At("HEAD"))
-    public void interceptApply(Map<ResourceLocation, JsonElement> map, ResourceManager resourceManager, ProfilerFiller profiler, CallbackInfo info) {
+    public void interceptApply(Map<ResourceLocation, JsonElement> map, ResourceManager resourceManager, ProfilerFiller profiler, CallbackInfo info)
     #endif
+    {
         #if MC_VER >= V1_21_3
         if (!loaded) {
             loaded = true;
@@ -115,7 +84,7 @@ public class RecipeManagerMixin {
 
             List<RecipeHolder<?>> allRecipes = new ArrayList<>(object.values());
 
-            for (int i = 0; i < 11; i++) {
+            for (int i = 0; i < ShelfModCommon.MATERIALS.size(); i++) {
                 ResourceLocation shelfId = #if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(ShelfModCommon.MODID, "shelf_item_" + ShelfModCommon.MATERIALS.get(i));
                 ResourceLocation floorShelfId = #if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(ShelfModCommon.MODID, "floor_shelf_item_" + ShelfModCommon.MATERIALS.get(i));
 
@@ -143,7 +112,7 @@ public class RecipeManagerMixin {
             apply(newMap, resourceManager, profiler);
         }
         #else
-        for (int i = 0; i < MATERIALS.size(); i++) {
+        for (int i = 0; i < ShelfModCommon.MATERIALS.size(); i++) {
             ResourceLocation shelfId = #if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(ShelfModCommon.MODID, "shelf_item_" + ShelfModCommon.MATERIALS.get(i));
             ResourceLocation floorShelfId = #if MC_VER >= V1_21 ResourceLocation.fromNamespaceAndPath #else new ResourceLocation #endif(ShelfModCommon.MODID, "floor_shelf_item_" + ShelfModCommon.MATERIALS.get(i));
 
