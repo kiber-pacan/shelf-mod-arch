@@ -16,7 +16,7 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 
 import static com.akciater.ShelfModCommon.MODID;
 
-@#if MC_VER < V1_21 Mod. #endif EventBusSubscriber(bus = #if MC_VER >= V1_21 EventBusSubscriber #else Mod.EventBusSubscriber #endif.Bus.MOD, modid = MODID)
+@#if MC_VER < V1_21 Mod. #endif EventBusSubscriber(#if MC_VER < V1_21_1 bus = #if MC_VER >= V1_21 EventBusSubscriber #else Mod.EventBusSubscriber #endif.Bus.MOD, #endif modid = MODID)
 public class ShelfModEventHandler {
     @SubscribeEvent
     public static void registerBER(EntityRenderersEvent.RegisterRenderers event) {

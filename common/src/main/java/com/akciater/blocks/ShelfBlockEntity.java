@@ -9,9 +9,14 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.ContainerHelper;
+#if MC_VER >= V1_21_5 import net.minecraft.world.Containers; #endif
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+#if MC_VER >= V1_21_6
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+#endif
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,16 +32,16 @@ public class ShelfBlockEntity extends BlockEntity {
     }
 
     // Load nbt data shit
-    #if MC_VER >= V1_21 protected #else public #endif void #if MC_VER >= V1_21 loadAdditional #else load #endif(CompoundTag compoundTag#if MC_VER >= V1_21 , HolderLookup.Provider provider#endif) {
-        #if MC_VER >= V1_21 super.loadAdditional(compoundTag, provider); #else super.load(compoundTag); #endif
-        ContainerHelper.loadAllItems(compoundTag, this.inv #if MC_VER >= V1_21 , provider #endif);
+    #if MC_VER >= V1_21 protected #else public #endif void #if MC_VER >= V1_21 loadAdditional #else load #endif(#if MC_VER <= V1_21_5 CompoundTag compoundTag #if MC_VER >= V1_21 , HolderLookup.Provider provider#endif #else ValueInput input #endif) {
+        #if MC_VER >= V1_21 super.loadAdditional(#if MC_VER <= V1_21_5 compoundTag, provider #else input #endif); #else super.load(compoundTag); #endif
+        ContainerHelper.loadAllItems(#if MC_VER <= V1_21_5 compoundTag, this.inv #if MC_VER >= V1_21, provider #endif #else input, this.inv #endif);
     }
 
     // Save nbt data
-    #if MC_VER >= V1_21 protected #else public @NotNull #endif  #if MC_VER < V1_18_2 CompoundTag save #else void saveAdditional #endif (CompoundTag compoundTag#if MC_VER >= V1_21 , HolderLookup.Provider provider#endif) {
-        super.#if MC_VER < V1_18_2 save #else saveAdditional #endif(compoundTag #if MC_VER >= V1_21 , provider #endif);
+    #if MC_VER >= V1_21 protected #else public @NotNull #endif  #if MC_VER < V1_18_2 CompoundTag save #else void saveAdditional #endif (#if MC_VER <= V1_21_5 CompoundTag compoundTag#if MC_VER >= V1_21 , HolderLookup.Provider provider #endif #else ValueOutput output #endif) {
+        super.#if MC_VER < V1_18_2 save #else saveAdditional #endif(#if MC_VER <= V1_21_5 compoundTag #if MC_VER >= V1_21 , provider #endif #else output #endif);
 
-        ContainerHelper.saveAllItems(compoundTag, this.inv #if MC_VER >= V1_21 , provider #endif);
+        ContainerHelper.saveAllItems(#if MC_VER <= V1_21_5 compoundTag, this.inv #if MC_VER >= V1_21 , provider #endif #else output, this.inv #endif);
 
         #if MC_VER < V1_18_2
         return compoundTag;
@@ -91,8 +96,6 @@ public class ShelfBlockEntity extends BlockEntity {
                 level.updateNeighbourForOutputSignal(pos, state.getBlock());
             }
         }
-
-        Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), state.getBlock().asItem().getDefaultInstance());
 
         super.preRemoveSideEffects(pos, state);
     }

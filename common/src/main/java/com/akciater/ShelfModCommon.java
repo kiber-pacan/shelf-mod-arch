@@ -224,7 +224,7 @@ public final class ShelfModCommon {
             RegistrySupplier<Block> shelf = blocks.register(
                     location,
                     () -> new Shelf(
-                            BlockBehaviour.Properties.of(#if MC_VER <= V1_19_4 Material.WOOD #endif).strength(0.5F, 3.0F).sound(SoundType.WOOD)
+                            BlockBehaviour.Properties.of(#if MC_VER <= V1_19_4 Material.WOOD #endif).strength(0.5F, 3.0F).sound(SoundType.WOOD)#if MC_VER >= V1_21_3 .setId(shelf_key) #endif
                     )
             );
 
@@ -261,7 +261,7 @@ public final class ShelfModCommon {
             RegistrySupplier<Block> floor_shelf = blocks.register(
                     location,
                     () -> new FloorShelf(
-                            BlockBehaviour.Properties.of(#if MC_VER <= V1_19_4 Material.WOOD #endif).strength(0.5F, 3.0F).sound(SoundType.WOOD)
+                            BlockBehaviour.Properties.of(#if MC_VER <= V1_19_4 Material.WOOD #endif).strength(0.5F, 3.0F).sound(SoundType.WOOD)#if MC_VER >= V1_21_3 .setId(shelf_key) #endif
                     )
             );
 
