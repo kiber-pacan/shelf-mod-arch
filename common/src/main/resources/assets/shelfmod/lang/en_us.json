@@ -8,6 +8,7 @@
   "block.shelfmod.shelf_jungle" : "Jungle shelf",
   "block.shelfmod.shelf_mangrove" : "Mangrove shelf",
   "block.shelfmod.shelf_oak" : "Oak shelf",
+  "block.shelfmod.shelf_pale_oak" : "Pale oak shelf",
   "block.shelfmod.shelf_warped" : "Warped shelf",
   "block.shelfmod.shelf_spruce" : "Spruce shelf",
 
@@ -20,8 +21,11 @@
   "block.shelfmod.floor_shelf_jungle" : "Jungle palette",
   "block.shelfmod.floor_shelf_mangrove" : "Mangrove palette",
   "block.shelfmod.floor_shelf_oak" : "Oak palette",
+  "block.shelfmod.floor_shelf_pale_oak" : "Pale oak palette",
   "block.shelfmod.floor_shelf_warped" : "Warped palette",
   "block.shelfmod.floor_shelf_spruce" : "Spruce palette",
+
+
 
   "item.shelfmod.shelf_acacia" : "Acacia shelf",
   "item.shelfmod.shelf_bamboo" : "Bamboo shelf",
@@ -32,6 +36,7 @@
   "item.shelfmod.shelf_jungle" : "Jungle shelf",
   "item.shelfmod.shelf_mangrove" : "Mangrove shelf",
   "item.shelfmod.shelf_oak" : "Oak shelf",
+  "item.shelfmod.shelf_pale_oak" : "Pale oak shelf",
   "item.shelfmod.shelf_warped" : "Warped shelf",
   "item.shelfmod.shelf_spruce" : "Spruce shelf",
 
@@ -44,6 +49,7 @@
   "item.shelfmod.floor_shelf_jungle" : "Jungle palette",
   "item.shelfmod.floor_shelf_mangrove" : "Mangrove palette",
   "item.shelfmod.floor_shelf_oak" : "Oak palette",
+  "item.shelfmod.floor_shelf_pale_oak" : "Pale oak palette",
   "item.shelfmod.floor_shelf_warped" : "Warped palette",
   "item.shelfmod.floor_shelf_spruce" : "Spruce palette",
 
@@ -56,6 +62,7 @@
   "item.shelfmod.shelf_item_jungle" : "Jungle shelf",
   "item.shelfmod.shelf_item_mangrove" : "Mangrove shelf",
   "item.shelfmod.shelf_item_oak" : "Oak shelf",
+  "item.shelfmod.shelf_item_pale_oak" : "Pale oak shelf",
   "item.shelfmod.shelf_item_warped" : "Warped shelf",
   "item.shelfmod.shelf_item_spruce" : "Spruce shelf",
 
@@ -68,8 +75,22 @@
   "item.shelfmod.floor_item_shelf_jungle" : "Jungle palette",
   "item.shelfmod.floor_item_shelf_mangrove" : "Mangrove palette",
   "item.shelfmod.floor_item_shelf_oak" : "Oak palette",
+  "item.shelfmod.floor_item_shelf_pale_oak" : "Pale oak palette",
   "item.shelfmod.floor_item_shelf_warped" : "Warped palette",
   "item.shelfmod.floor_item_shelf_spruce" : "Spruce palette",
+
+  "item.shelfmod.floor_shelf_item_acacia" : "Acacia palette",
+  "item.shelfmod.floor_shelf_item_bamboo" : "Bamboo palette",
+  "item.shelfmod.floor_shelf_item_birch" : "Birch palette",
+  "item.shelfmod.floor_shelf_item_cherry" : "Cherry palette",
+  "item.shelfmod.floor_shelf_item_crimson" : "Crimson palette",
+  "item.shelfmod.floor_shelf_item_dark_oak" : "Dark oak palette",
+  "item.shelfmod.floor_shelf_item_jungle" : "Jungle palette",
+  "item.shelfmod.floor_shelf_item_mangrove" : "Mangrove palette",
+  "item.shelfmod.floor_shelf_item_oak" : "Oak palette",
+  "item.shelfmod.floor_shelf_item_pale_oak" : "Pale oak palette",
+  "item.shelfmod.floor_shelf_item_warped" : "Warped palette",
+  "item.shelfmod.floor_shelf_item_spruce" : "Spruce palette",
 
   "text.autoconfig.shelfmod.option.size" : "Size of item on the shelf",
   "itemGroup.shelfmod.shelf_mod_tab" : "Shelf mod"

@@ -23,6 +23,8 @@
   "block.shelfmod.floor_shelf_warped" : "Искаженный паллет",
   "block.shelfmod.floor_shelf_spruce" : "Еловый паллет",
 
+
+
   "item.shelfmod.shelf_acacia" : "Акациевая полка",
   "item.shelfmod.shelf_bamboo" : "Бамбуковая полка",
   "item.shelfmod.shelf_birch" : "Березовая полка",
@@ -70,6 +72,19 @@
   "item.shelfmod.floor_item_shelf_oak" : "Дубовый паллет",
   "item.shelfmod.floor_item_shelf_warped" : "Искаженный паллет",
   "item.shelfmod.floor_item_shelf_spruce" : "Еловый паллет",
+
+  "item.shelfmod.floor_shelf_item_acacia" : "Acacia palette",
+  "item.shelfmod.floor_shelf_item_bamboo" : "Bamboo palette",
+  "item.shelfmod.floor_shelf_item_birch" : "Birch palette",
+  "item.shelfmod.floor_shelf_item_cherry" : "Cherry palette",
+  "item.shelfmod.floor_shelf_item_crimson" : "Crimson palette",
+  "item.shelfmod.floor_shelf_item_dark_oak" : "Dark oak palette",
+  "item.shelfmod.floor_shelf_item_jungle" : "Jungle palette",
+  "item.shelfmod.floor_shelf_item_mangrove" : "Mangrove palette",
+  "item.shelfmod.floor_shelf_item_oak" : "Oak palette",
+  "item.shelfmod.floor_shelf_item_pale_oak" : "Pale oak palette",
+  "item.shelfmod.floor_shelf_item_warped" : "Warped palette",
+  "item.shelfmod.floor_shelf_item_spruce" : "Spruce palette",
 
   "text.autoconfig.shelfmod.option.size" : "Размер предмета на полке",
   "itemGroup.shelfmod.shelf_mod_tab" : "Shelf mod"
