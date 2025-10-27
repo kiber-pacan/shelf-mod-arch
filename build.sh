@@ -4,9 +4,9 @@ echo "-------------------------------"
 echo "------------BUILDING-----------"
 echo "-------------------------------"
 mkdir -p buildAllJars | true
-y=10
+y=1
 
-for i in $(seq 2 $END); do
+for i in $(seq 16 $END); do
     sh gradlew build -Pindex="$y"
 
     mv ./*/build/libs/shelfmod-*-[!c]*-*[[:digit:]].jar "buildAllJars"
