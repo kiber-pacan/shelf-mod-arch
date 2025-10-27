@@ -1,23 +1,34 @@
 package com.akciater.mixin;
 
+
+#if MC_VER < V1_21_3
 import com.akciater.ShelfModCommon;
-import com.google.gson.*;
-#if MC_VER >= V1_18_2
-#if MC_VER >= V1_19_4
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.item.crafting.RecipeManager;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.Map;
+import java.util.logging.Logger;
+#else
+import com.akciater.ShelfModCommon;
+import com.google.gson.JsonObject;
 import net.minecraft.core.HolderLookup;
-#endif
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.crafting.Recipe;
-#if MC_VER >= V1_20_4
 import net.minecraft.world.item.crafting.RecipeHolder;
-#endif
 import net.minecraft.world.item.crafting.RecipeManager;
-
-import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.RecipeMap;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -26,15 +37,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
+#endif
 
-#if MC_VER >= V1_21_3
-import net.minecraft.world.item.crafting.RecipeMap;
-#endif
-#endif
 
 @Mixin(RecipeManager.class)
 public class RecipeManagerMixin {
@@ -65,7 +71,7 @@ public class RecipeManagerMixin {
     public void interceptApply(RecipeMap object, ResourceManager resourceManager, ProfilerFiller profiler, CallbackInfo ci)
     #else
     @Inject(method = "apply(Ljava/util/Map;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V", at = @At("HEAD"))
-    public void interceptApply(Map<ResourceLocation, JsonElement> map, ResourceManager resourceManager, ProfilerFiller profiler, CallbackInfo info)
+    public void interceptApply(Map<ResourceLocation, JsonElement> object, ResourceManager resourceManager, ProfilerFiller profiler, CallbackInfo ci)
     #endif
     {
         #if MC_VER >= V1_21_3
@@ -119,8 +125,8 @@ public class RecipeManagerMixin {
             JsonObject shelfJSON = ShelfModCommon.SHELVES_JSON.get(i * 2);
             JsonObject floorShelfJSON = ShelfModCommon.SHELVES_JSON.get(i * 2 + 1);
 
-            map.put(shelfId, shelfJSON);
-            map.put(floorShelfId, floorShelfJSON);
+            object.put(shelfId, shelfJSON);
+            object.put(floorShelfId, floorShelfJSON);
         }
         #endif
 
