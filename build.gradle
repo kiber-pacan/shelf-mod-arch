@@ -134,7 +134,11 @@ subprojects {
 
         mappings loom.layered() {
             officialMojangMappings()
-            parchment("org.parchmentmc.data:parchment-${rootProject.minecraft_version}:${rootProject.parchment}@zip")
+            if (rootProject.minecraft_version == "1.21.1") {
+                parchment("org.parchmentmc.data:parchment-1.21:${rootProject.parchment}@zip")
+            } else {
+                parchment("org.parchmentmc.data:parchment-${rootProject.minecraft_version}:${rootProject.parchment}@zip")
+            }
         }
     }
 
