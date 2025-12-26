@@ -2,8 +2,9 @@ package com.akciater.fabricShelfMod.client;
 
 import com.akciater.client.ber.FloorShelfBER;
 import com.akciater.client.ber.ShelfBER;
-import dev.architectury.registry.client.rendering.BlockEntityRendererRegistry;
 import net.fabricmc.api.ClientModInitializer;
+import dev.architectury.registry.client.rendering.BlockEntityRendererRegistry;
+
 
 import static com.akciater.ShelfModCommon.FLOOR_SHELF_BLOCK_ENTITY;
 import static com.akciater.ShelfModCommon.SHELF_BLOCK_ENTITY;
