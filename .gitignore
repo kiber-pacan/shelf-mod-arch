@@ -45,3 +45,5 @@ wrapper/
 
 *.jar
 daemon/
+
+credentials.properties
